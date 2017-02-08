@@ -12,9 +12,8 @@
  *
  *const PersonSchema = new Schema({
  *  name: {
- *     type: ObjectId,
- *      ref: 'Person',
- *      searchable: true // make field searchable
+ *     type: String,
+ *     searchable: true // make field searchable
  *  }
  *});
  *

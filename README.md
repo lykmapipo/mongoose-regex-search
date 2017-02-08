@@ -28,8 +28,7 @@ mongoose.plugin(require('mongoose-regex-searchable'));
 
 const PersonSchema = new Schema({
     name: {
-        type: ObjectId,
-        ref: 'Person',
+        type: String,
         searchable: true // make field searchable
     }
 });
