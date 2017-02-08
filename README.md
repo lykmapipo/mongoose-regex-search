@@ -1,8 +1,8 @@
-# mongoose-regex-searchable
+# mongoose-regex-search
 
-[![Build Status](https://travis-ci.org/lykmapipo/mongoose-regex-searchable.svg?branch=master)](https://travis-ci.org/lykmapipo/mongoose-regex-searchable)
-[![Dependency Status](https://img.shields.io/david/lykmapipo/mongoose-regex-searchable.svg?style=flat)](https://david-dm.org/lykmapipo/mongoose-regex-searchable)
-[![npm version](https://badge.fury.io/js/mongoose-regex-searchable.svg)](https://badge.fury.io/js/mongoose-regex-searchable)
+[![Build Status](https://travis-ci.org/lykmapipo/mongoose-regex-search.svg?branch=master)](https://travis-ci.org/lykmapipo/mongoose-regex-search)
+[![Dependency Status](https://img.shields.io/david/lykmapipo/mongoose-regex-search.svg?style=flat)](https://david-dm.org/lykmapipo/mongoose-regex-search)
+[![npm version](https://badge.fury.io/js/mongoose-regex-search.svg)](https://badge.fury.io/js/mongoose-regex-search)
 
 mongoose plugin to regex search on schema searchable fields.
 
@@ -12,7 +12,7 @@ mongoose plugin to regex search on schema searchable fields.
 
 ## Install
 ```sh
-$ npm install --save mongoose-regex-searchable
+$ npm install --save mongoose-regex-search
 ```
 
 ## Usage
@@ -21,8 +21,8 @@ $ npm install --save mongoose-regex-searchable
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-//apply mongoose-regex-searchable plugin to mongoose
-mongoose.plugin(require('mongoose-regex-searchable'));
+//apply mongoose-regex-search plugin to mongoose
+mongoose.plugin(require('mongoose-regex-search'));
 
 ...
 
