@@ -27,7 +27,7 @@ mongoose.plugin(require('mongoose-regex-search'));
 ...
 
 const PersonSchema = new Schema({
-    name: {
+    address: {
         type: String,
         searchable: true // make field searchable
     }
@@ -58,6 +58,36 @@ $ npm test
 
 ## Contribute
 It will be nice, if you open an issue first so that we can know what is going on, then, fork this repo and push in your ideas. Do not forget to add a bit of test(s) of what value you adding.
+
+## TODO
+- [ ] Make use of single array to store seachables?
+- [ ] Allow searchables for array of promotives
+- [ ] Allow searchable on ref pre populated(or do prepopulate)
+	- Introduce searchable model to build index on top
+	- User.Name -> searchables({userName})
+
+## Seachable Schema
+```js
+{
+	age:Number,
+	name:String,
+	guardian:ObjectId,
+	dependants:[ObjectId],
+	tags:[String],
+	contacts:[Mixed],
+}
+
+{
+	//search index
+	searchable:{
+		age:Number,
+		name:String,
+		guardianName:String,
+		guardianPhone:String
+		etc
+	}
+}
+```
 
 ## Licence
 The MIT License (MIT)
