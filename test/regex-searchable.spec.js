@@ -24,9 +24,22 @@ const PersonSchema = new Schema({
       searchable: true
     }
   },
+  contacts: [{
+    type: {
+      type: String,
+      default: 'Phone'
+    },
+    value: {
+      type: String
+    }
+  }],
   address: {
     type: String,
     index: true,
+    searchable: true
+  },
+  titles: {
+    type: [String],
     searchable: true
   }
 });
@@ -39,7 +52,8 @@ describe('mongoose-regex-searchable', function () {
       firstName: faker.name.firstName(),
       surname: faker.name.lastName()
     },
-    address: faker.address.streetAddress()
+    address: faker.address.streetAddress(),
+    titles: [faker.name.jobTitle(), faker.name.jobTitle()]
   };
 
   before(function (done) {
@@ -86,6 +100,29 @@ describe('mongoose-regex-searchable', function () {
           expect(found.name.firstName).to.equal(person.name.firstName);
           expect(found.name.lastName).to.equal(person.name.lastName);
           expect(found.address).to.equal(person.address);
+
+          done(error, results);
+
+        });
+    });
+
+  it('should be able to search using array of string schema fields',
+    function (done) {
+      Person
+        .search(person.titles[0], function (error, results) {
+
+          expect(error).to.not.exist;
+          expect(results).to.exist;
+          expect(results).to.have.length.above(0);
+
+          //assert single result
+          const found = results[0];
+          expect(found.address).to.exist;
+
+          expect(found.name.firstName).to.equal(person.name.firstName);
+          expect(found.name.lastName).to.equal(person.name.lastName);
+          expect(found.address).to.equal(person.address);
+          expect(found.titles).to.include.members(person.titles);
 
           done(error, results);
 

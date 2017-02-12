@@ -39,6 +39,7 @@ module.exports = exports = function (schema) {
   schema.eachPath(function (pathName, schemaType) {
     //TODO handle number schema types
 
+
     //collect searchable fields
     const isSearchable =
       _.get(schemaType.options, 'searchable');
