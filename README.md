@@ -4,7 +4,7 @@
 [![Dependency Status](https://img.shields.io/david/lykmapipo/mongoose-regex-search.svg?style=flat)](https://david-dm.org/lykmapipo/mongoose-regex-search)
 [![npm version](https://badge.fury.io/js/mongoose-regex-search.svg)](https://badge.fury.io/js/mongoose-regex-search)
 
-mongoose plugin to regex search on schema searchable fields. It support regex search in `direct schema fields`, `array of primitives` and `single embeded doc fields`.
+mongoose plugin to regex search on schema searchable fields. It support regex search in `primitives schema fields`, `array of primitives` and `single embeded doc fields`.
 
 **Note!: indexing searchable fields is highly advice to improve search performance**
 
@@ -29,6 +29,11 @@ mongoose.plugin(require('mongoose-regex-search'));
 ...
 
 const PersonSchema = new Schema({
+  age: {
+    type: Number,
+    index: true,
+    searchable: true
+  },
   name: {
     firstName: {
       type: String,
@@ -63,6 +68,9 @@ Person.search(<queryString>, <fn>);
 let query = Person.search(<queryString>);
 
 ```
+
+## References
+- [mongodb regex](https://docs.mongodb.com/manual/reference/operator/query/regex/)
 
 ## Testing
 * Clone this repository

@@ -31,21 +31,42 @@
 const _ = require('lodash');
 
 
-module.exports = exports = function (schema) {
+module.exports = exports = function (schema, options) {
+  //merge options
+  options = _.merge({}, { delta: 0.1 }, options);
+
   //collect searchable fields
   let searchables = [];
 
+  //collect searchable which are numbers
+  let numbers = [];
+
   //collect searchable path
   schema.eachPath(function (pathName, schemaType) {
-    //TODO handle number schema types
+    //TODO handle ref schema type
 
-
-    //collect searchable fields
+    //check if schematype is searchable
     const isSearchable =
       _.get(schemaType.options, 'searchable');
+
+    //check if schema instance is number
+    const isNumber =
+      _.get(schemaType, 'instance') === 'Number' ||
+      _.get(schemaType, 'caster.instance') === 'Number';
+
+    //collect searchable fields
     if (isSearchable) {
+
+      //collect searchable fields
       searchables.push(pathName);
+
+      //collect number fields
+      if (isNumber) {
+        numbers.push(pathName);
+      }
+
     }
+
   });
 
 
@@ -61,6 +82,8 @@ module.exports = exports = function (schema) {
    * @public
    */
   schema.statics.search = function (queryString, done) {
+    //check if query string is a number
+    const isNumberQueryString = _.isNumber(queryString);
 
     //prepare search query
     let query = this.find();
@@ -75,17 +98,30 @@ module.exports = exports = function (schema) {
       //collect searchable and build regex
       let fieldSearchCriteria = {};
 
-      //prepare regex search to simulate SQL like query
-      //with case ignored
-      fieldSearchCriteria[searchable] =
-        new RegExp(queryString + '$', 'i'); // lets use LIKE %
+      //check if searchable field is a number
+      const isNumberSearchable = _.indexOf(numbers, searchable) >= 0;
 
-      criteria.$or.push(fieldSearchCriteria);
+      //prepare regex search on string to simulate SQL like query
+      //with case ignored
+      if (!isNumberSearchable) {
+        fieldSearchCriteria[searchable] =
+          new RegExp(queryString + '$', 'i'); // lets use LIKE %
+        criteria.$or.push(fieldSearchCriteria);
+      }
+
+      //prepare fake regex search on number fields
+      if (isNumberSearchable && isNumberQueryString) {
+        fieldSearchCriteria[searchable] = {
+          $gt: queryString - options.delta,
+          $lte: queryString + options.delta
+        };
+        criteria.$or.push(fieldSearchCriteria);
+      }
 
     });
 
     //ensure query critia on current query instance
-    if (!_.isEmpty(queryString) && _.size(searchables) > 0) {
+    if (queryString && _.size(searchables) > 0) {
       query = query.find(criteria);
     }
 
