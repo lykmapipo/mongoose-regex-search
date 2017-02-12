@@ -71,8 +71,13 @@ let query = Person.search(<queryString>);
 
 ```
 
+## TODO
+- [ ] Add support to array of subdocument
+- [ ] Check ability to support refs
+
 ## References
 - [mongodb regex](https://docs.mongodb.com/manual/reference/operator/query/regex/)
+
 
 ## Testing
 * Clone this repository

@@ -29,13 +29,17 @@ const PersonSchema = new Schema({
       searchable: true
     }
   },
-  contacts: [{
-    type: {
+  contacts: [{ //TODO
+    form: {
       type: String,
-      default: 'Phone'
+      default: 'Phone',
+      index: true,
+      searchable: true
     },
     value: {
-      type: String
+      type: String,
+      index: true,
+      searchable: true
     }
   }],
   address: {
@@ -79,7 +83,8 @@ describe('mongoose-regex-searchable', function () {
     });
   });
 
-  it('should be able to search using string schema fields', function (done) {
+  it('should be able to search using string schema fields', function (
+    done) {
     Person
       .search(person.address, function (error, results) {
 
@@ -100,7 +105,8 @@ describe('mongoose-regex-searchable', function () {
       });
   });
 
-  it('should be able to search using number schema fields', function (done) {
+  it('should be able to search using number schema fields', function (
+    done) {
     Person
       .search(person.age, function (error, results) {
 

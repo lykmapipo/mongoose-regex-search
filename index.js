@@ -44,6 +44,7 @@ module.exports = exports = function (schema, options) {
   //collect searchable path
   schema.eachPath(function (pathName, schemaType) {
     //TODO handle ref schema type
+    //TODO handle array of sub document
 
     //check if schematype is searchable
     const isSearchable =
