@@ -40,6 +40,7 @@ const PersonSchema = new Schema({
   },
   titles: {
     type: [String],
+    index: true,
     searchable: true
   }
 });
