@@ -11,7 +11,7 @@
  * @example
  *
  *const PersonSchema = new Schema({
- *  name: {
+ *  address: {
  *     type: String,
  *     searchable: true // make field searchable
  *  }

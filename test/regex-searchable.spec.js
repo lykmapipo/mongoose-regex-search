@@ -13,6 +13,18 @@ mongoose.plugin(require(path.join(__dirname, '..')));
 //prepare schema
 const PersonSchema = new Schema({
   name: {
+    firstName: {
+      type: String,
+      index: true,
+      searchable: true
+    },
+    surname: {
+      type: String,
+      index: true,
+      searchable: true
+    }
+  },
+  address: {
     type: String,
     index: true,
     searchable: true
@@ -23,7 +35,11 @@ const Person = mongoose.model('Person', PersonSchema);
 describe('mongoose-regex-searchable', function () {
 
   let person = {
-    name: faker.company.companyName()
+    name: {
+      firstName: faker.name.firstName(),
+      surname: faker.name.lastName()
+    },
+    address: faker.address.streetAddress()
   };
 
   before(function (done) {
@@ -33,9 +49,9 @@ describe('mongoose-regex-searchable', function () {
     });
   });
 
-  it('should be able to search', function (done) {
+  it('should be able to search using direct schema fields', function (done) {
     Person
-      .search(person.name, function (error, results) {
+      .search(person.address, function (error, results) {
 
         expect(error).to.not.exist;
         expect(results).to.exist;
@@ -43,9 +59,32 @@ describe('mongoose-regex-searchable', function () {
 
         //assert single result
         const found = results[0];
-        expect(found.name).to.exist;
+        expect(found.address).to.exist;
 
-        expect(found.name).to.equal(person.name);
+        expect(found.name.firstName).to.equal(person.name.firstName);
+        expect(found.name.lastName).to.equal(person.name.lastName);
+        expect(found.address).to.equal(person.address);
+
+        done(error, results);
+
+      });
+  });
+
+  it('should be able to search using sub schema fields', function (done) {
+    Person
+      .search(person.firstName, function (error, results) {
+
+        expect(error).to.not.exist;
+        expect(results).to.exist;
+        expect(results).to.have.length.above(0);
+
+        //assert single result
+        const found = results[0];
+        expect(found.address).to.exist;
+
+        expect(found.name.firstName).to.equal(person.name.firstName);
+        expect(found.name.lastName).to.equal(person.name.lastName);
+        expect(found.address).to.equal(person.address);
 
         done(error, results);
 

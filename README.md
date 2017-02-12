@@ -6,6 +6,8 @@
 
 mongoose plugin to regex search on schema searchable fields.
 
+**Note!: indexing searchable fields is highly advice to improve search performance**
+
 ## Requirements
 
 - NodeJS v6.5+
@@ -27,10 +29,23 @@ mongoose.plugin(require('mongoose-regex-search'));
 ...
 
 const PersonSchema = new Schema({
-    address: {
-        type: String,
-        searchable: true // make field searchable
+  name: {
+    firstName: {
+      type: String,
+      index: true,
+      searchable: true
+    },
+    surname: {
+      type: String,
+      index: true,
+      searchable: true
     }
+  },
+  address: {
+    type: String,
+    index: true,
+    searchable: true
+  }
 });
 
 ...
