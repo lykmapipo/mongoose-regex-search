@@ -70,26 +70,27 @@ describe('mongoose-regex-searchable', function () {
       });
   });
 
-  it('should be able to search using sub schema fields', function (done) {
-    Person
-      .search(person.firstName, function (error, results) {
+  it('should be able to search using single embedded subdocs fields',
+    function (done) {
+      Person
+        .search(person.firstName, function (error, results) {
 
-        expect(error).to.not.exist;
-        expect(results).to.exist;
-        expect(results).to.have.length.above(0);
+          expect(error).to.not.exist;
+          expect(results).to.exist;
+          expect(results).to.have.length.above(0);
 
-        //assert single result
-        const found = results[0];
-        expect(found.address).to.exist;
+          //assert single result
+          const found = results[0];
+          expect(found.address).to.exist;
 
-        expect(found.name.firstName).to.equal(person.name.firstName);
-        expect(found.name.lastName).to.equal(person.name.lastName);
-        expect(found.address).to.equal(person.address);
+          expect(found.name.firstName).to.equal(person.name.firstName);
+          expect(found.name.lastName).to.equal(person.name.lastName);
+          expect(found.address).to.equal(person.address);
 
-        done(error, results);
+          done(error, results);
 
-      });
-  });
+        });
+    });
 
   after(function (done) {
     Person.remove(done);
