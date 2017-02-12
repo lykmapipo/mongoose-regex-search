@@ -9,7 +9,9 @@
     "search",
     "searchable",
     "regex",
-    "like"
+    "like",
+    "mongodb",
+    "subdoc"
   ],
   "main": "index.js",
   "scripts": {
