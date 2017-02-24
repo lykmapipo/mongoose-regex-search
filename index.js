@@ -1,5 +1,6 @@
 'use strict';
 
+
 /**
  * @name searchable
  * @description mongoose plugin to regex search on schema searchable fields.
@@ -10,12 +11,12 @@
  * @version 0.1.0
  * @example
  *
- *const PersonSchema = new Schema({
+ * const PersonSchema = new Schema({
  *  address: {
  *     type: String,
  *     searchable: true // make field searchable
  *  }
- *});
+ * });
  *
  *...
  *
@@ -26,6 +27,7 @@
  * //search return query for futher chaining
  * let query = Person.search(<queryString>);
  */
+
 
 //dependencies
 const _ = require('lodash');
@@ -105,8 +107,11 @@ module.exports = exports = function (schema, options) {
       //prepare regex search on string to simulate SQL like query
       //with case ignored
       if (!isNumberSearchable) {
-        fieldSearchCriteria[searchable] =
-          new RegExp(queryString + '$', 'i'); // lets use LIKE %
+        fieldSearchCriteria[searchable] = {
+          //see https://docs.mongodb.com/manual/reference/sql-comparison/
+          $regex: new RegExp(queryString), // lets use LIKE %queryString%
+          $options: 'i' //perform case insensitive search
+        };
         criteria.$or.push(fieldSearchCriteria);
       }
 

@@ -105,6 +105,51 @@ describe('mongoose-regex-searchable', function () {
       });
   });
 
+  it('should be able to search using parts of a string schema fields',
+    function (done) {
+      Person
+        .search(person.address.split(' ')[0], function (error, results) {
+
+          expect(error).to.not.exist;
+          expect(results).to.exist;
+          expect(results).to.have.length.above(0);
+
+          //assert single result
+          const found = results[0];
+          expect(found.address).to.exist;
+
+          expect(found.name.firstName).to.equal(person.name.firstName);
+          expect(found.name.lastName).to.equal(person.name.lastName);
+          expect(found.address).to.equal(person.address);
+
+          done(error, results);
+
+        });
+    });
+
+  it(
+    'should be able to do case insensitive search using string schema fields',
+    function (done) {
+      Person
+        .search(person.address.toUpperCase(), function (error, results) {
+
+          expect(error).to.not.exist;
+          expect(results).to.exist;
+          expect(results).to.have.length.above(0);
+
+          //assert single result
+          const found = results[0];
+          expect(found.address).to.exist;
+
+          expect(found.name.firstName).to.equal(person.name.firstName);
+          expect(found.name.lastName).to.equal(person.name.lastName);
+          expect(found.address).to.equal(person.address);
+
+          done(error, results);
+
+        });
+    });
+
   it('should be able to search using number schema fields', function (
     done) {
     Person
