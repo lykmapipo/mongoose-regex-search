@@ -55,7 +55,7 @@ module.exports = exports = function (schema, options) {
    * @version 0.1.0
    * @private
    */
-  function collectSearchablePath(pathName, schemaType, parentPath) {
+  function collectSearchablePaths(pathName, schemaType, parentPath) {
 
     //TODO handle refs(ObjectId) schema type
 
@@ -68,7 +68,7 @@ module.exports = exports = function (schema, options) {
       _.isFunction(schemaType.schema.eachPath);
     if (isSchema) {
       schemaType.schema.eachPath(function (_pathName, _schemaType) {
-        collectSearchablePath(_pathName, _schemaType, pathName);
+        collectSearchablePaths(_pathName, _schemaType, pathName);
       });
     }
 
@@ -93,16 +93,25 @@ module.exports = exports = function (schema, options) {
       }
 
     }
+
   }
 
   //collect searchable path
   schema.eachPath(function (pathName, schemaType) {
-    collectSearchablePath(pathName, schemaType);
+    collectSearchablePaths(pathName, schemaType);
   });
-
 
   //expose searchable fields as schema statics
   schema.statics.SEARCHABLE_FIELDS = _.compact(searchables);
+
+  //EXPERIMENTAL
+  //TODO find a way to name the compaund index
+  //ensure compaund index to all searchable fields
+  // let indexes = {};
+  // _.forEach(_.compact(searchables), function (searchable) {
+  //   indexes[searchable] = 1; //TODO review mongodb literature on compaund indexes
+  // });
+  // schema.index(indexes);
 
 
   /**
@@ -117,6 +126,7 @@ module.exports = exports = function (schema, options) {
    * @public
    */
   schema.statics.search = function (queryString, done) {
+
     //check if query string is a number
     const isNumberQueryString = _.isNumber(queryString);
 
