@@ -7,6 +7,10 @@ const Schema = mongoose.Schema;
 const faker = require('faker');
 const expect = require('chai').expect;
 
+//TODO test for single sub schema
+//TODO test for array of sub-schema
+//TODO add searchable doc and index it to support refs
+
 //apply mongoose-autoset plugin
 mongoose.plugin(require(path.join(__dirname, '..')));
 
