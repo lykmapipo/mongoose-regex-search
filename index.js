@@ -34,6 +34,7 @@ const _ = require('lodash');
 
 
 module.exports = exports = function (schema, options) {
+
   //merge options
   options = _.merge({}, { delta: 0.1 }, options);
 
@@ -43,10 +44,33 @@ module.exports = exports = function (schema, options) {
   //collect searchable which are numbers
   let numbers = [];
 
-  //collect searchable path
-  schema.eachPath(function (pathName, schemaType) {
-    //TODO handle ref schema type
-    //TODO handle array of sub document
+  /**
+   * @name  collectSearchablePath
+   * @description iterate recursively on schema paths and collect searchable
+   *              paths only
+   * @param  {String} pathName   [description]
+   * @param  {SchemaType} schemaType [description]
+   * @param  {String} parentPath [description]
+   * @since  0.3.0
+   * @version 0.1.0
+   * @private
+   */
+  function collectSearchablePath(pathName, schemaType, parentPath) {
+
+    //TODO handle refs(ObjectId) schema type
+
+    //update path name
+    pathName = _.compact([parentPath, pathName]).join('.');
+
+    //start handle sub schemas
+    const isSchema =
+      schemaType.schema && schemaType.schema.eachPath &&
+      _.isFunction(schemaType.schema.eachPath);
+    if (isSchema) {
+      schemaType.schema.eachPath(function (_pathName, _schemaType) {
+        collectSearchablePath(_pathName, _schemaType, pathName);
+      });
+    }
 
     //check if schematype is searchable
     const isSearchable =
@@ -69,8 +93,16 @@ module.exports = exports = function (schema, options) {
       }
 
     }
+  }
 
+  //collect searchable path
+  schema.eachPath(function (pathName, schemaType) {
+    collectSearchablePath(pathName, schemaType);
   });
+
+
+  //expose searchable fields as schema statics
+  schema.statics.SEARCHABLE_FIELDS = _.compact(searchables);
 
 
   /**

@@ -14,6 +14,38 @@ const expect = require('chai').expect;
 //apply mongoose-autoset plugin
 mongoose.plugin(require(path.join(__dirname, '..')));
 
+//sub schema definition
+const Relative = new Schema({
+  name: {
+    type: String,
+    searchable: true
+  }
+});
+
+const Country = new Schema({
+  name: {
+    type: String,
+    searchable: true
+  }
+});
+
+const City = new Schema({
+  name: {
+    type: String,
+    searchable: true
+  },
+  country: Country
+});
+
+//nested
+const Residence = new Schema({
+  street: {
+    type: String,
+    searchable: true
+  },
+  city: City
+});
+
 //prepare schema
 const PersonSchema = new Schema({
   age: {
@@ -60,7 +92,12 @@ const PersonSchema = new Schema({
     type: [Number],
     index: true,
     searchable: true
-  }
+  },
+  brother: Relative,
+  aunt: { type: Relative },
+  sisters: { type: [Relative] },
+  friends: [Relative],
+  residence: Residence
 });
 const Person = mongoose.model('Person', PersonSchema);
 
@@ -77,7 +114,26 @@ describe('mongoose-regex-searchable', function () {
     scores: [
       faker.random.number({ min: 20, max: 45 }),
       faker.random.number({ min: 20, max: 45 })
-    ]
+    ],
+    brother: { name: faker.name.findName() },
+    aunt: { name: faker.name.findName() },
+    sisters: [
+      { name: faker.name.findName() },
+      { name: faker.name.findName() }
+    ],
+    friends: [
+      { name: faker.name.findName() },
+      { name: faker.name.findName() }
+    ],
+    residence: { //nested
+      street: faker.address.streetName(),
+      city: {
+        name: faker.address.city(),
+        country: {
+          name: faker.address.country()
+        }
+      }
+    }
   };
 
   before(function (done) {
@@ -86,6 +142,31 @@ describe('mongoose-regex-searchable', function () {
       done(error, created);
     });
   });
+
+  it('should be able to navigate paths and build searchable fields',
+    function () {
+      expect(Person.SEARCHABLE_FIELDS).to.exist;
+      expect(Person.SEARCHABLE_FIELDS).to.be.an('array');
+      expect(Person.SEARCHABLE_FIELDS).to.have.length(15);
+
+      //assert searchable fields
+      expect(Person.SEARCHABLE_FIELDS).to.contain('age');
+      expect(Person.SEARCHABLE_FIELDS).to.contain('name.firstName');
+      expect(Person.SEARCHABLE_FIELDS).to.contain('name.surname');
+      expect(Person.SEARCHABLE_FIELDS).to.contain('contacts.form');
+      expect(Person.SEARCHABLE_FIELDS).to.contain('contacts.value');
+      expect(Person.SEARCHABLE_FIELDS).to.contain('address');
+      expect(Person.SEARCHABLE_FIELDS).to.contain('titles');
+      expect(Person.SEARCHABLE_FIELDS).to.contain('scores');
+      expect(Person.SEARCHABLE_FIELDS).to.contain('brother.name');
+      expect(Person.SEARCHABLE_FIELDS).to.contain('aunt.name');
+      expect(Person.SEARCHABLE_FIELDS).to.contain('sisters.name');
+      expect(Person.SEARCHABLE_FIELDS).to.contain('friends.name');
+      expect(Person.SEARCHABLE_FIELDS).to.contain('residence.street');
+      expect(Person.SEARCHABLE_FIELDS).to.contain('residence.city.name');
+      expect(Person.SEARCHABLE_FIELDS)
+        .to.contain('residence.city.country.name');
+    });
 
   it('should be able to search using string schema fields', function (
     done) {
