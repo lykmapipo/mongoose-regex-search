@@ -2,6 +2,7 @@
 
 //dependencies
 const path = require('path');
+const _ = require('lodash');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const faker = require('faker');
@@ -166,29 +167,30 @@ describe('mongoose-regex-searchable', function () {
       expect(Person.SEARCHABLE_FIELDS).to.contain('residence.city.name');
       expect(Person.SEARCHABLE_FIELDS)
         .to.contain('residence.city.country.name');
+
     });
 
-  it('should be able to search using string schema fields', function (
-    done) {
-    Person
-      .search(person.address, function (error, results) {
+  it('should be able to search using string schema fields',
+    function (done) {
+      Person
+        .search(person.address, function (error, results) {
 
-        expect(error).to.not.exist;
-        expect(results).to.exist;
-        expect(results).to.have.length.above(0);
+          expect(error).to.not.exist;
+          expect(results).to.exist;
+          expect(results).to.have.length.above(0);
 
-        //assert single result
-        const found = results[0];
-        expect(found.address).to.exist;
+          //assert single result
+          const found = results[0];
+          expect(found.address).to.exist;
 
-        expect(found.name.firstName).to.equal(person.name.firstName);
-        expect(found.name.lastName).to.equal(person.name.lastName);
-        expect(found.address).to.equal(person.address);
+          expect(found.name.firstName).to.equal(person.name.firstName);
+          expect(found.name.lastName).to.equal(person.name.lastName);
+          expect(found.address).to.equal(person.address);
 
-        done(error, results);
+          done(error, results);
 
-      });
-  });
+        });
+    });
 
   it('should be able to search using parts of a string schema fields',
     function (done) {
@@ -280,6 +282,28 @@ describe('mongoose-regex-searchable', function () {
         });
     });
 
+  it('should be able to search using single embedded subdocs fields',
+    function (done) {
+      Person
+        .search(person.brother.name, function (error, results) {
+
+          expect(error).to.not.exist;
+          expect(results).to.exist;
+          expect(results).to.have.length.above(0);
+
+          //assert single result
+          const found = results[0];
+          expect(found.address).to.exist;
+
+          expect(found.name.firstName).to.equal(person.name.firstName);
+          expect(found.name.lastName).to.equal(person.name.lastName);
+          expect(found.address).to.equal(person.address);
+
+          done(error, results);
+
+        });
+    });
+
   it('should be able to search using array of string schema fields',
     function (done) {
       Person
@@ -321,6 +345,95 @@ describe('mongoose-regex-searchable', function () {
           expect(found.address).to.equal(person.address);
           expect(found.titles).to.include.members(person.titles);
           expect(found.scores).to.include.members(person.scores);
+
+          done(error, results);
+
+        });
+    });
+
+  it('should be able to search using array if embedded subdocs fields',
+    function (done) {
+      Person
+        .search(_.first(person.sisters).name, function (error, results) {
+
+          expect(error).to.not.exist;
+          expect(results).to.exist;
+          expect(results).to.have.length.above(0);
+
+          //assert single result
+          const found = results[0];
+          expect(found.address).to.exist;
+
+          expect(found.name.firstName).to.equal(person.name.firstName);
+          expect(found.name.lastName).to.equal(person.name.lastName);
+          expect(found.address).to.equal(person.address);
+
+          done(error, results);
+
+        });
+    });
+
+  it('should be able to search using single embedded subdoc nested fields',
+    function (done) {
+      Person
+        .search(person.residence.street, function (error, results) {
+
+          expect(error).to.not.exist;
+          expect(results).to.exist;
+          expect(results).to.have.length.above(0);
+
+          //assert single result
+          const found = results[0];
+          expect(found.address).to.exist;
+
+          expect(found.name.firstName).to.equal(person.name.firstName);
+          expect(found.name.lastName).to.equal(person.name.lastName);
+          expect(found.address).to.equal(person.address);
+
+          done(error, results);
+
+        });
+    });
+
+  it('should be able to search using single embedded subdoc nested fields',
+    function (done) {
+      Person
+        .search(person.residence.city.name, function (error, results) {
+
+          expect(error).to.not.exist;
+          expect(results).to.exist;
+          expect(results).to.have.length.above(0);
+
+          //assert single result
+          const found = results[0];
+          expect(found.address).to.exist;
+
+          expect(found.name.firstName).to.equal(person.name.firstName);
+          expect(found.name.lastName).to.equal(person.name.lastName);
+          expect(found.address).to.equal(person.address);
+
+          done(error, results);
+
+        });
+    });
+
+  it('should be able to search using single embedded subdoc nested fields',
+    function (done) {
+      Person
+        .search(person.residence.city.country.name, function (error,
+          results) {
+
+          expect(error).to.not.exist;
+          expect(results).to.exist;
+          expect(results).to.have.length.above(0);
+
+          //assert single result
+          const found = results[0];
+          expect(found.address).to.exist;
+
+          expect(found.name.firstName).to.equal(person.name.firstName);
+          expect(found.name.lastName).to.equal(person.name.lastName);
+          expect(found.address).to.equal(person.address);
 
           done(error, results);
 
