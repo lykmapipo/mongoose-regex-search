@@ -6,9 +6,9 @@
 
 mongoose plugin to regex search on schema searchable fields. 
 
-It support regex search in `primitives schema fields`, `array of primitives` and `single embeded doc fields`.
+It support regex search in `primitives schema fields`, `array of primitives`, `single embeded doc fields` and `array embeded doc fields`.
 
-**Note!: indexing searchable fields is highly advice to improve search performance**
+**Note!: indexing searchable fields is highly advice to improve search performance. This is left to your system specifics for query optimization.**
 
 ## Requirements
 
@@ -30,6 +30,39 @@ mongoose.plugin(require('mongoose-regex-search'));
 
 ...
 
+//sub schema definition
+const Relative = new Schema({
+  name: {
+    type: String,
+    searchable: true
+  }
+});
+
+const Country = new Schema({
+  name: {
+    type: String,
+    searchable: true
+  }
+});
+
+const City = new Schema({
+  name: {
+    type: String,
+    searchable: true
+  },
+  country: Country
+});
+
+//nested
+const Residence = new Schema({
+  street: {
+    type: String,
+    searchable: true
+  },
+  city: City
+});
+
+//prepare schema
 const PersonSchema = new Schema({
   age: {
     type: Number,
@@ -48,16 +81,39 @@ const PersonSchema = new Schema({
       searchable: true
     }
   },
+  contacts: [{ //TODO
+    form: {
+      type: String,
+      default: 'Phone',
+      index: true,
+      searchable: true
+    },
+    value: {
+      type: String,
+      index: true,
+      searchable: true
+    }
+  }],
   address: {
     type: String,
     index: true,
     searchable: true
   },
-  titles:{
-  	type:[String],
-  	index:true,
-  	searchable:true
-  }
+  titles: {
+    type: [String],
+    index: true,
+    searchable: true
+  },
+  scores: {
+    type: [Number],
+    index: true,
+    searchable: true
+  },
+  brother: Relative,
+  aunt: { type: Relative },
+  sisters: { type: [Relative] },
+  friends: [Relative],
+  residence: Residence
 });
 
 ...

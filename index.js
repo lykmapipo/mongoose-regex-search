@@ -104,16 +104,6 @@ module.exports = exports = function (schema, options) {
   //expose searchable fields as schema statics
   schema.statics.SEARCHABLE_FIELDS = _.compact(searchables);
 
-  //EXPERIMENTAL
-  //TODO find a way to name the compaund index
-  //ensure compaund index to all searchable fields
-  // let indexes = {};
-  // _.forEach(_.compact(searchables), function (searchable) {
-  //   indexes[searchable] = 1; //TODO review mongodb literature on compaund indexes
-  // });
-  // schema.index(indexes);
-
-
   /**
    * @name search
    * @description perform free text search using regex
