@@ -128,7 +128,6 @@ let query = Person.search(<queryString>);
 ```
 
 ## TODO
-- [ ] Review on mongodb compaund index to create compaund index for all searchable fields
 - [ ] Check ability to support refs by caching searchable fields
   * [ ] find a ref before save
   * [ ] obtain searchable field
