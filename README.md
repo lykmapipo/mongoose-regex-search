@@ -1,7 +1,7 @@
 # mongoose-regex-search
 
 [![Build Status](https://travis-ci.org/lykmapipo/mongoose-regex-search.svg?branch=master)](https://travis-ci.org/lykmapipo/mongoose-regex-search)
-[![Dependency Status](https://img.shields.io/david/lykmapipo/mongoose-regex-search.svg?style=flat)](https://david-dm.org/lykmapipo/mongoose-regex-search)
+[![Dependencies Status](https://david-dm.org/lykmapipo/mongoose-regex-search/status.svg)](https://david-dm.org/lykmapipo/mongoose-regex-search)
 [![npm version](https://badge.fury.io/js/mongoose-regex-search.svg)](https://badge.fury.io/js/mongoose-regex-search)
 
 mongoose plugin to regex search on schema searchable fields. 
