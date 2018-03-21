@@ -127,19 +127,6 @@ let query = Person.search(<queryString>);
 
 ```
 
-## TODO
-- [ ] Check ability to support refs by caching searchable fields
-  * [ ] find a ref before save
-  * [ ] obtain searchable field
-  * [ ] append them on search index 
-   ```js
-   {
-     searchable:{
-       <ref_name> : {<searchable_fields}
-     }
-   }
-   ```
-
 ## References
 - [mongodb regex](https://docs.mongodb.com/manual/reference/operator/query/regex/)
 

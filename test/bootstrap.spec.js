@@ -15,7 +15,7 @@ mongoose.Promise = global.Promise;
  * @description wipe all mongoose model data and drop all indexes
  */
 function wipe(done) {
-  var cleanups = mongoose.modelNames()
+  const cleanups = mongoose.modelNames()
     .map(function (modelName) {
       //grab mongoose model
       return mongoose.model(modelName);
