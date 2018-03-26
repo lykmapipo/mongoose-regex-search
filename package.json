@@ -50,7 +50,7 @@
     "grunt-contrib-watch": "^1.0.0",
     "grunt-mocha-test": "^0.13.3",
     "jshint-stylish": "^2.2.1",
-    "mocha": "^5.0.4",
+    "mocha": "^5.0.5",
     "mongoose": "^5.0.11"
   },
   "dependencies": {
