@@ -16,7 +16,7 @@ It support regex search in `primitives schema fields`, `array of primitives`, `s
 
 ## Install
 ```sh
-$ npm install --save mongoose-regex-search
+$ npm install --save mongoose mongoose-regex-search
 ```
 
 ## Usage
