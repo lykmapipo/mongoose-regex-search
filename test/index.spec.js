@@ -439,7 +439,7 @@ describe('mongoose-regex-searchable', function () {
     });
 
   after(function (done) {
-    Person.remove(done);
+    Person.deleteMany(done);
   });
 
 });

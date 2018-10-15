@@ -1,50 +1,34 @@
 'use strict';
 
-//set environment to test
+
 process.env.NODE_ENV = 'test';
 
-//dependencies
-const async = require('async');
+
+/* dependencies */
 const mongoose = require('mongoose');
-mongoose.Promise = global.Promise;
+const MONGODB_URI = 'mongodb://localhost/mongoose-regex-search';
 
-//enable mongoose query debug(log)
-// mongoose.set('debug', true);
 
-/**
- * @description wipe all mongoose model data and drop all indexes
- */
-function wipe(done) {
-  const cleanups = mongoose.modelNames()
-    .map(function (modelName) {
-      //grab mongoose model
-      return mongoose.model(modelName);
-    })
-    .map(function (Model) {
-      return async.series.bind(null, [
-        //clean up all model data
-        Model.remove.bind(Model),
-        //drop all indexes
-        Model.collection.dropAllIndexes.bind(Model.collection)
-      ]);
-    });
+/* clean and restore database */
+const wipe = (done) => {
+  if (mongoose.connection && mongoose.connection.dropDatabase) {
+    mongoose.connection.dropDatabase(done);
+  } else {
+    done();
+  }
+};
 
-  //run all clean ups parallel
-  async.parallel(cleanups, function (error) {
-    if (error && error.message !== 'ns not found') {
-      done(error);
-    } else {
-      done(null);
-    }
-  });
-}
 
-//setup database
-before(function (done) {
-  mongoose.connect('mongodb://localhost/mongoose-regex-searchable', done);
+/* setup database */
+before((done) => {
+  const options = { useNewUrlParser: true };
+  mongoose.connect(MONGODB_URI, options, done);
 });
 
-// restore initial environment
-after(function (done) {
-  wipe(done);
-});
+
+/* clear database */
+before(wipe);
+
+
+/* clear database */
+after(wipe);
