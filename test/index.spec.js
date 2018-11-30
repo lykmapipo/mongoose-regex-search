@@ -100,7 +100,7 @@ const PersonSchema = new Schema({
 });
 const Person = mongoose.model('Person', PersonSchema);
 
-describe('mongoose-regex-searchable', function () {
+describe('mongoose-regex-searchable', () => {
 
   let person = {
     age: faker.random.number({ min: 20, max: 45 }),
@@ -135,65 +135,64 @@ describe('mongoose-regex-searchable', function () {
     }
   };
 
-  before(function (done) {
-    Person.create(person, function (error, created) {
+  before((done) => {
+    Person.create(person, (error, created) => {
       person = created;
       done(error, created);
     });
   });
 
-  it('should be able to navigate paths and build searchable fields',
-    function () {
-      expect(Person.SEARCHABLE_FIELDS).to.exist;
-      expect(Person.SEARCHABLE_FIELDS).to.be.an('array');
-      expect(Person.SEARCHABLE_FIELDS).to.have.length(15);
+  it('should be able to navigate paths and build searchable fields', () => {
+    expect(Person.SEARCHABLE_FIELDS).to.exist;
+    expect(Person.SEARCHABLE_FIELDS).to.be.an('array');
+    expect(Person.SEARCHABLE_FIELDS).to.have.length(15);
 
-      //assert searchable fields
-      expect(Person.SEARCHABLE_FIELDS).to.contain('age');
-      expect(Person.SEARCHABLE_FIELDS).to.contain('name.firstName');
-      expect(Person.SEARCHABLE_FIELDS).to.contain('name.surname');
-      expect(Person.SEARCHABLE_FIELDS).to.contain('contacts.form');
-      expect(Person.SEARCHABLE_FIELDS).to.contain('contacts.value');
-      expect(Person.SEARCHABLE_FIELDS).to.contain('address');
-      expect(Person.SEARCHABLE_FIELDS).to.contain('titles');
-      expect(Person.SEARCHABLE_FIELDS).to.contain('scores');
-      expect(Person.SEARCHABLE_FIELDS).to.contain('brother.name');
-      expect(Person.SEARCHABLE_FIELDS).to.contain('aunt.name');
-      expect(Person.SEARCHABLE_FIELDS).to.contain('sisters.name');
-      expect(Person.SEARCHABLE_FIELDS).to.contain('friends.name');
-      expect(Person.SEARCHABLE_FIELDS).to.contain('residence.street');
-      expect(Person.SEARCHABLE_FIELDS).to.contain('residence.city.name');
-      expect(Person.SEARCHABLE_FIELDS)
-        .to.contain('residence.city.country.name');
+    //assert searchable fields
+    expect(Person.SEARCHABLE_FIELDS).to.contain('age');
+    expect(Person.SEARCHABLE_FIELDS).to.contain('name.firstName');
+    expect(Person.SEARCHABLE_FIELDS).to.contain('name.surname');
+    expect(Person.SEARCHABLE_FIELDS).to.contain('contacts.form');
+    expect(Person.SEARCHABLE_FIELDS).to.contain('contacts.value');
+    expect(Person.SEARCHABLE_FIELDS).to.contain('address');
+    expect(Person.SEARCHABLE_FIELDS).to.contain('titles');
+    expect(Person.SEARCHABLE_FIELDS).to.contain('scores');
+    expect(Person.SEARCHABLE_FIELDS).to.contain('brother.name');
+    expect(Person.SEARCHABLE_FIELDS).to.contain('aunt.name');
+    expect(Person.SEARCHABLE_FIELDS).to.contain('sisters.name');
+    expect(Person.SEARCHABLE_FIELDS).to.contain('friends.name');
+    expect(Person.SEARCHABLE_FIELDS).to.contain('residence.street');
+    expect(Person.SEARCHABLE_FIELDS).to.contain('residence.city.name');
+    expect(Person.SEARCHABLE_FIELDS)
+      .to.contain('residence.city.country.name');
 
-    });
+  });
 
-  it('should be able to search using string schema fields',
-    function (done) {
-      Person
-        .search(person.address, function (error, results) {
+  it('should be able to search using string schema fields', (done) => {
+    const q = person.address;
+    Person
+      .search(q, (error, results) => {
 
-          expect(error).to.not.exist;
-          expect(results).to.exist;
-          expect(results).to.have.length.above(0);
+        expect(error).to.not.exist;
+        expect(results).to.exist;
+        expect(results).to.have.length.above(0);
 
-          //assert single result
-          const found = results[0];
-          expect(found.address).to.exist;
+        //assert single result
+        const found = results[0];
+        expect(found.address).to.exist;
 
-          expect(found.name.firstName).to.equal(person.name.firstName);
-          expect(found.name.lastName).to.equal(person.name.lastName);
-          expect(found.address).to.equal(person.address);
+        expect(found.name.firstName).to.equal(person.name.firstName);
+        expect(found.name.lastName).to.equal(person.name.lastName);
+        expect(found.address).to.equal(person.address);
 
-          done(error, results);
-
-        });
-    });
+        done(error, results);
+      });
+  });
 
   it('should be able to search using parts of a string schema fields',
-    function (done) {
+    (done) => {
+      const q = person.address.split(' ')[0];
       Person
-        .search(person.address.split(' ')[0], function (error, results) {
+        .search(q, (error, results) => {
 
           expect(error).to.not.exist;
           expect(results).to.exist;
@@ -208,15 +207,15 @@ describe('mongoose-regex-searchable', function () {
           expect(found.address).to.equal(person.address);
 
           done(error, results);
-
         });
     });
 
   it(
     'should be able to do case insensitive search using string schema fields',
-    function (done) {
+    (done) => {
+      const q = person.address.toUpperCase();
       Person
-        .search(person.address.toUpperCase(), function (error, results) {
+        .search(q, (error, results) => {
 
           expect(error).to.not.exist;
           expect(results).to.exist;
@@ -231,38 +230,36 @@ describe('mongoose-regex-searchable', function () {
           expect(found.address).to.equal(person.address);
 
           done(error, results);
-
         });
     });
 
   it(
     'should be able to do case insensitive search using part of a string schema fields',
-    function (done) {
+    (done) => {
+      const q = person.name.firstName.split(' ')[0].toUpperCase();
       Person
-        .search(person.name.firstName.split(' ')[0].toUpperCase(),
-          function (error, results) {
+        .search(q, (error, results) => {
 
-            expect(error).to.not.exist;
-            expect(results).to.exist;
-            expect(results).to.have.length.above(0);
+          expect(error).to.not.exist;
+          expect(results).to.exist;
+          expect(results).to.have.length.above(0);
 
-            //assert single result
-            const found = results[0];
-            expect(found.address).to.exist;
+          //assert single result
+          const found = results[0];
+          expect(found.address).to.exist;
 
-            expect(found.name.firstName).to.equal(person.name.firstName);
-            expect(found.name.lastName).to.equal(person.name.lastName);
-            expect(found.address).to.equal(person.address);
+          expect(found.name.firstName).to.equal(person.name.firstName);
+          expect(found.name.lastName).to.equal(person.name.lastName);
+          expect(found.address).to.equal(person.address);
 
-            done(error, results);
-
-          });
+          done(error, results);
+        });
     });
 
-  it('should be able to search using number schema fields', function (
-    done) {
+  it('should be able to search using number schema fields', (done) => {
+    const q = person.age;
     Person
-      .search(person.age, function (error, results) {
+      .search(q, (error, results) => {
 
         expect(error).to.not.exist;
         expect(results).to.exist;
@@ -278,105 +275,101 @@ describe('mongoose-regex-searchable', function () {
         expect(found.age).to.equal(person.age);
 
         done(error, results);
-
       });
   });
 
-  it('should be able to search using single embedded subdocs fields',
-    function (done) {
-      Person
-        .search(person.firstName, function (error, results) {
+  it('should be able to search using single embedded subdocs fields', (done) => {
+    const q = person.firstName;
+    Person
+      .search(q, (error, results) => {
 
-          expect(error).to.not.exist;
-          expect(results).to.exist;
-          expect(results).to.have.length.above(0);
+        expect(error).to.not.exist;
+        expect(results).to.exist;
+        expect(results).to.have.length.above(0);
 
-          //assert single result
-          const found = results[0];
-          expect(found.address).to.exist;
+        //assert single result
+        const found = results[0];
+        expect(found.address).to.exist;
 
-          expect(found.name.firstName).to.equal(person.name.firstName);
-          expect(found.name.lastName).to.equal(person.name.lastName);
-          expect(found.address).to.equal(person.address);
+        expect(found.name.firstName).to.equal(person.name.firstName);
+        expect(found.name.lastName).to.equal(person.name.lastName);
+        expect(found.address).to.equal(person.address);
 
-          done(error, results);
+        done(error, results);
+      });
+  });
 
-        });
-    });
+  it('should be able to search using single embedded subdocs fields', (done) => {
+    const q = person.brother.name;
+    Person
+      .search(q, (error, results) => {
 
-  it('should be able to search using single embedded subdocs fields',
-    function (done) {
-      Person
-        .search(person.brother.name, function (error, results) {
+        expect(error).to.not.exist;
+        expect(results).to.exist;
+        expect(results).to.have.length.above(0);
 
-          expect(error).to.not.exist;
-          expect(results).to.exist;
-          expect(results).to.have.length.above(0);
+        //assert single result
+        const found = results[0];
+        expect(found.address).to.exist;
 
-          //assert single result
-          const found = results[0];
-          expect(found.address).to.exist;
+        expect(found.name.firstName).to.equal(person.name.firstName);
+        expect(found.name.lastName).to.equal(person.name.lastName);
+        expect(found.address).to.equal(person.address);
 
-          expect(found.name.firstName).to.equal(person.name.firstName);
-          expect(found.name.lastName).to.equal(person.name.lastName);
-          expect(found.address).to.equal(person.address);
+        done(error, results);
+      });
+  });
 
-          done(error, results);
+  it('should be able to search using array of string schema fields', (done) => {
+    const q = person.titles[0];
+    Person
+      .search(q, (error, results) => {
 
-        });
-    });
+        expect(error).to.not.exist;
+        expect(results).to.exist;
+        expect(results).to.have.length.above(0);
 
-  it('should be able to search using array of string schema fields',
-    function (done) {
-      Person
-        .search(person.titles[0], function (error, results) {
+        //assert single result
+        const found = results[0];
+        expect(found.address).to.exist;
 
-          expect(error).to.not.exist;
-          expect(results).to.exist;
-          expect(results).to.have.length.above(0);
+        expect(found.name.firstName).to.equal(person.name.firstName);
+        expect(found.name.lastName).to.equal(person.name.lastName);
+        expect(found.address).to.equal(person.address);
+        expect(found.titles).to.include.members(person.titles);
 
-          //assert single result
-          const found = results[0];
-          expect(found.address).to.exist;
+        done(error, results);
+      });
+  });
 
-          expect(found.name.firstName).to.equal(person.name.firstName);
-          expect(found.name.lastName).to.equal(person.name.lastName);
-          expect(found.address).to.equal(person.address);
-          expect(found.titles).to.include.members(person.titles);
+  it('should be able to search using array of number schema fields', (done) => {
+    const q = person.scores[0];
+    Person
+      .search(q, (error, results) => {
 
-          done(error, results);
+        expect(error).to.not.exist;
+        expect(results).to.exist;
+        expect(results).to.have.length.above(0);
 
-        });
-    });
+        //assert single result
+        const found = results[0];
+        expect(found.address).to.exist;
 
-  it('should be able to search using array of number schema fields',
-    function (done) {
-      Person
-        .search(person.scores[0], function (error, results) {
+        expect(found.name.firstName).to.equal(person.name.firstName);
+        expect(found.name.lastName).to.equal(person.name.lastName);
+        expect(found.address).to.equal(person.address);
+        expect(found.titles).to.include.members(person.titles);
+        expect(found.scores).to.include.members(person.scores);
 
-          expect(error).to.not.exist;
-          expect(results).to.exist;
-          expect(results).to.have.length.above(0);
-
-          //assert single result
-          const found = results[0];
-          expect(found.address).to.exist;
-
-          expect(found.name.firstName).to.equal(person.name.firstName);
-          expect(found.name.lastName).to.equal(person.name.lastName);
-          expect(found.address).to.equal(person.address);
-          expect(found.titles).to.include.members(person.titles);
-          expect(found.scores).to.include.members(person.scores);
-
-          done(error, results);
-
-        });
-    });
+        done(error, results);
+      });
+  });
 
   it('should be able to search using array if embedded subdocs fields',
-    function (done) {
+    (done) => {
+      const q = _.first(person.sisters).name;
       Person
-        .search(_.first(person.sisters).name, function (error, results) {
+        .search(q, (error, results) => {
 
           expect(error).to.not.exist;
           expect(results).to.exist;
@@ -391,14 +384,14 @@ describe('mongoose-regex-searchable', function () {
           expect(found.address).to.equal(person.address);
 
           done(error, results);
-
         });
     });
 
   it('should be able to search using single embedded subdoc nested fields',
-    function (done) {
+    (done) => {
+      const q = person.residence.street;
       Person
-        .search(person.residence.street, function (error, results) {
+        .search(q, (error, results) => {
 
           expect(error).to.not.exist;
           expect(results).to.exist;
@@ -413,14 +406,14 @@ describe('mongoose-regex-searchable', function () {
           expect(found.address).to.equal(person.address);
 
           done(error, results);
-
         });
     });
 
   it('should be able to search using single embedded subdoc nested fields',
-    function (done) {
+    (done) => {
+      const q = person.residence.city.name;
       Person
-        .search(person.residence.city.name, function (error, results) {
+        .search(q, (error, results) => {
 
           expect(error).to.not.exist;
           expect(results).to.exist;
@@ -435,15 +428,14 @@ describe('mongoose-regex-searchable', function () {
           expect(found.address).to.equal(person.address);
 
           done(error, results);
-
         });
     });
 
   it('should be able to search using single embedded subdoc nested fields',
-    function (done) {
+    (done) => {
+      const q = person.residence.city.country.name;
       Person
-        .search(person.residence.city.country.name, function (error,
-          results) {
+        .search(q, (error, results) => {
 
           expect(error).to.not.exist;
           expect(results).to.exist;
@@ -458,11 +450,10 @@ describe('mongoose-regex-searchable', function () {
           expect(found.address).to.equal(person.address);
 
           done(error, results);
-
         });
     });
 
-  after(function (done) {
+  after((done) => {
     Person.deleteMany(done);
   });
 

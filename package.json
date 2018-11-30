@@ -1,6 +1,6 @@
 {
   "name": "mongoose-regex-search",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "description": "mongoose plugin to regex search on schema searchable fields.",
   "keywords": [
     "mongoose",
@@ -42,6 +42,7 @@
     }
   ],
   "devDependencies": {
+    "@lykmapipo/mongoose-test-helpers": "^0.1.1",
     "chai": "^4.2.0",
     "faker": "^4.1.0",
     "grunt": "^1.0.3",
@@ -49,12 +50,12 @@
     "grunt-contrib-watch": "^1.1.0",
     "grunt-mocha-test": "^0.13.3",
     "jshint-stylish": "^2.2.1",
-    "mocha": "^5.2.0",
     "lodash": "^4.17.11",
-    "mongoose": "^5.3.10"
+    "mocha": "^5.2.0",
+    "mongoose": "^5.3.14"
   },
   "peerDependencies": {
     "lodash": "^4.17.11",
-    "mongoose": "^5.3.10"
+    "mongoose": "^5.3.14"
   }
 }
