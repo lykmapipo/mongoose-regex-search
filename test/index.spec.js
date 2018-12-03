@@ -10,8 +10,8 @@ const expect = require('chai').expect;
 
 //TODO add searchable doc and index it to support refs
 
-//apply mongoose-autoset plugin
-mongoose.plugin(require(path.join(__dirname, '..')));
+//apply mongoose-regex-search plugin
+// mongoose.plugin(require(path.join(__dirname, '..')));
 
 //sub schema definition
 const Relative = new Schema({
@@ -98,9 +98,10 @@ const PersonSchema = new Schema({
   friends: [Relative],
   residence: Residence
 });
+PersonSchema.plugin(require(path.join(__dirname, '..')));
 const Person = mongoose.model('Person', PersonSchema);
 
-describe('mongoose-regex-searchable', () => {
+describe('internals', () => {
 
   let person = {
     age: faker.random.number({ min: 20, max: 45 }),
@@ -190,7 +191,29 @@ describe('mongoose-regex-searchable', () => {
 
   it('should be able to search using parts of a string schema fields',
     (done) => {
-      const q = person.address.split(' ')[0];
+      const q = _.first(person.address.split(' '));
+      Person
+        .search(q, (error, results) => {
+
+          expect(error).to.not.exist;
+          expect(results).to.exist;
+          expect(results).to.have.length.above(0);
+
+          //assert single result
+          const found = results[0];
+          expect(found.address).to.exist;
+
+          expect(found.name.firstName).to.equal(person.name.firstName);
+          expect(found.name.lastName).to.equal(person.name.lastName);
+          expect(found.address).to.equal(person.address);
+
+          done(error, results);
+        });
+    });
+
+  it('should be able to search using parts of a string schema fields',
+    (done) => {
+      const q = _.upperFirst(_.last(person.address.split(' ')));
       Person
         .search(q, (error, results) => {
 

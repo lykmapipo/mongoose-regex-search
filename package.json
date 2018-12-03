@@ -42,6 +42,7 @@
     }
   ],
   "devDependencies": {
+    "@lykmapipo/mongoose-faker": "^0.8.1",
     "@lykmapipo/mongoose-test-helpers": "^0.1.1",
     "chai": "^4.2.0",
     "faker": "^4.1.0",

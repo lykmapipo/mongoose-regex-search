@@ -5,6 +5,8 @@
  * @name searchable
  * @description mongoose plugin to regex search on schema searchable fields.
  * @param  {Schema} schema  valid mongoose schema
+ * @see {@link https://docs.mongodb.com/manual/reference/operator/query/regex/}
+ * @see {@link https://docs.mongodb.com/manual/reference/collation/}
  * @return {Function} valid mongoose plugin
  * @author lally elias <lallyelias87@mail.com>
  * @since  0.1.0
