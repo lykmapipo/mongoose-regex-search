@@ -1,155 +1,87 @@
 'use strict';
 
 
-//dependencies
+/* dependencies */
 const path = require('path');
 const _ = require('lodash');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const faker = require('faker');
 const expect = require('chai').expect;
 const searchable = require(path.join(__dirname, '..'));
 
 
-//prepare schema
-const PersonSchema = new Schema({
-  firstName: {
-    type: String,
-    index: true,
-    searchable: true
-  },
-  surname: {
-    type: String,
-    index: true,
-    searchable: true
-  }
+/* prepare schema */
+const UseCaseSchema = new Schema({
+  content: { type: String, index: true, searchable: true }
 });
-PersonSchema.plugin(searchable);
-const Person = mongoose.model('UseCase', PersonSchema);
+UseCaseSchema.plugin(searchable);
+const UseCase = mongoose.model('UseCase', UseCaseSchema);
 
 
-describe('use cases', () => {
+/* test */
+const check = (error, results, usecase, done) => {
+  expect(error).to.not.exist;
+  expect(results).to.exist;
+  expect(results).to.have.length.above(0);
 
-  before((done) => {
-    Person.deleteMany(done);
-  });
+  //assert single result
+  const found = results[0];
+  expect(found.content).to.equal(usecase.content);
 
-  let person = {
-    firstName: _.toUpper(faker.name.firstName()),
-    surname: _.toLower(faker.name.lastName()),
-  };
+  done(error, results);
+};
 
-  before((done) => {
-    Person.create(person, (error, created) => {
-      person = created;
-      done(error, created);
+
+/* use cases */
+const usecases = [{
+  context: 'search on field start with cap',
+  title: 'should work',
+  content: 'Earth',
+  q: 'ea',
+  test: check
+}, {
+  context: 'search on uppercase fields',
+  title: 'should work',
+  content: 'EARTH',
+  q: 'ea',
+  test: check
+}, {
+  context: 'search on uppercase fields',
+  title: 'should work',
+  content: 'EARTH',
+  q: 'EA',
+  test: check
+}];
+
+
+_.forEach(usecases, (usecase) => {
+
+  // derive usecase
+  const { context, title, content, q, test } = usecase;
+  describe(`${context}`, () => {
+
+    // clear
+    before((done) => {
+      UseCase.deleteMany(done);
     });
-  });
 
-  it('should be able to search on uppercased fields', (done) => {
-    const q = person.firstName;
-    Person.search(q, (error, results) => {
-
-      expect(error).to.not.exist;
-      expect(results).to.exist;
-      expect(results).to.have.length.above(0);
-
-      //assert single result
-      const found = results[0];
-      expect(found.firstName).to.equal(person.firstName);
-      expect(found.surname).to.equal(person.surname);
-
-      done(error, results);
+    // setup test data
+    before((done) => {
+      UseCase.create({ content }, done);
     });
-  });
 
-  it('should be able to search on uppercased fields', (done) => {
-    const q = _.toLower(person.firstName);
-    Person.search(q, (error, results) => {
-
-      expect(error).to.not.exist;
-      expect(results).to.exist;
-      expect(results).to.have.length.above(0);
-
-      //assert single result
-      const found = results[0];
-      expect(found.firstName).to.equal(person.firstName);
-      expect(found.surname).to.equal(person.surname);
-
-      done(error, results);
+    // use case driver
+    it(`${title}`, (done) => {
+      UseCase.search(q, (error, results) => {
+        test(error, results, usecase, done);
+      });
     });
-  });
 
-  it('should be able to search on uppercased fields', (done) => {
-    const q = _.startCase(person.firstName);
-    Person.search(q, (error, results) => {
-
-      expect(error).to.not.exist;
-      expect(results).to.exist;
-      expect(results).to.have.length.above(0);
-
-      //assert single result
-      const found = results[0];
-      expect(found.firstName).to.equal(person.firstName);
-      expect(found.surname).to.equal(person.surname);
-
-      done(error, results);
+    // clear
+    after((done) => {
+      UseCase.deleteMany(done);
     });
-  });
 
-  it('should be able to search on lowercased fields', (done) => {
-    const q = person.surname;
-    Person.search(q, (error, results) => {
-
-      expect(error).to.not.exist;
-      expect(results).to.exist;
-      expect(results).to.have.length.above(0);
-
-      //assert single result
-      const found = results[0];
-      expect(found.firstName).to.equal(person.firstName);
-      expect(found.surname).to.equal(person.surname);
-
-      done(error, results);
-    });
-  });
-
-  it('should be able to search on lowercased fields', (done) => {
-    const q = _.toUpper(person.surname);
-    Person.search(q, (error, results) => {
-
-      expect(error).to.not.exist;
-      expect(results).to.exist;
-      expect(results).to.have.length.above(0);
-
-      //assert single result
-      const found = results[0];
-      expect(found.firstName).to.equal(person.firstName);
-      expect(found.surname).to.equal(person.surname);
-
-      done(error, results);
-    });
-  });
-
-  it('should be able to search on lowercased fields', (done) => {
-    const q = _.startCase(person.surname);
-    Person.search(q, (error, results) => {
-
-      expect(error).to.not.exist;
-      expect(results).to.exist;
-      expect(results).to.have.length.above(0);
-
-      //assert single result
-      const found = results[0];
-      expect(found.firstName).to.equal(person.firstName);
-      expect(found.surname).to.equal(person.surname);
-
-      done(error, results);
-    });
-  });
-
-  after((done) => {
-    Person.deleteMany(done);
   });
 
 });
