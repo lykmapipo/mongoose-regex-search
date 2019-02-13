@@ -9,7 +9,6 @@ const faker = require('faker');
 const expect = require('chai').expect;
 
 //TODO add searchable doc and index it to support refs
-// mongoose.set('debug', true);
 
 //sub schema definition
 const Relative = new Schema({
@@ -145,7 +144,7 @@ describe('internals', () => {
     });
   });
 
-  it.only('should to navigate paths and build searchable fields', () => {
+  it('should to navigate paths and build searchable fields', () => {
     expect(Person.SEARCHABLE_FIELDS).to.exist;
     expect(Person.SEARCHABLE_FIELDS).to.be.an('array');
     expect(Person.SEARCHABLE_FIELDS).to.have.length(13);
@@ -172,7 +171,6 @@ describe('internals', () => {
   it('should search using string schema fields', done => {
     const q = person.address;
     Person.search(q, (error, results) => {
-      console.log(error);
       expect(error).to.not.exist;
       expect(results).to.exist;
       expect(results).to.have.length.above(0);
@@ -275,28 +273,6 @@ describe('internals', () => {
         });
     });
 
-  it.skip('should search using number schema fields', done => {
-    const q = person.age;
-    Person
-      .search(q, (error, results) => {
-
-        expect(error).to.not.exist;
-        expect(results).to.exist;
-        expect(results).to.have.length.above(0);
-
-        //assert single result
-        const found = results[0];
-        expect(found.address).to.exist;
-
-        expect(found.name.firstName).to.equal(person.name.firstName);
-        expect(found.name.lastName).to.equal(person.name.lastName);
-        expect(found.address).to.equal(person.address);
-        expect(found.age).to.equal(person.age);
-
-        done(error, results);
-      });
-  });
-
   it('should search using single embedded subdocs fields', done => {
     const q = person.firstName;
     Person
@@ -356,29 +332,6 @@ describe('internals', () => {
         expect(found.name.lastName).to.equal(person.name.lastName);
         expect(found.address).to.equal(person.address);
         expect(found.titles).to.include.members(person.titles);
-
-        done(error, results);
-      });
-  });
-
-  it.skip('should search using array of number schema fields', done => {
-    const q = person.scores[0];
-    Person
-      .search(q, (error, results) => {
-
-        expect(error).to.not.exist;
-        expect(results).to.exist;
-        expect(results).to.have.length.above(0);
-
-        //assert single result
-        const found = results[0];
-        expect(found.address).to.exist;
-
-        expect(found.name.firstName).to.equal(person.name.firstName);
-        expect(found.name.lastName).to.equal(person.name.lastName);
-        expect(found.address).to.equal(person.address);
-        expect(found.titles).to.include.members(person.titles);
-        expect(found.scores).to.include.members(person.scores);
 
         done(error, results);
       });
@@ -466,6 +419,34 @@ describe('internals', () => {
 
         done(error, results);
       });
+  });
+
+  it('should filter and search using schema fields', done => {
+    const q = person.address;
+    Person.search(q, { age: { $eq: person.age } }, (error, results) => {
+      expect(error).to.not.exist;
+      expect(results).to.exist;
+      expect(results).to.have.length.above(0);
+
+      //assert single result
+      const found = results[0];
+      expect(found.address).to.exist;
+
+      expect(found.name.firstName).to.equal(person.name.firstName);
+      expect(found.name.lastName).to.equal(person.name.lastName);
+      expect(found.address).to.equal(person.address);
+
+      done(error, results);
+    });
+  });
+
+  it('should filter and search using schema fields', done => {
+    const q = faker.name.findName();
+    Person.search(q, { age: { $eq: person.age } }, (error, results) => {
+      expect(error).to.not.exist;
+      expect(results.length).to.be.equal(0);
+      done(error, results);
+    });
   });
 
   after(done => {

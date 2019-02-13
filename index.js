@@ -55,12 +55,15 @@ const collectSearchables = schema => {
 
 
 /**
+ * @function searchable
  * @name searchable
  * @description mongoose plugin to regex search on schema searchable fields.
- * @param {Schema} schema  valid mongoose schema
+ * @param {Schema} schema valid mongoose schema
  * @see {@link https://docs.mongodb.com/manual/reference/operator/query/regex/}
  * @see {@link https://docs.mongodb.com/manual/reference/collation/}
- * @return {Function} valid mongoose plugin
+ * @see {@link https://docs.mongodb.com/manual/reference/operator/query/and/}
+ * @see {@link https://docs.mongodb.com/manual/reference/operator/query/or/}
+ * @return {Function} valid mongoose schema plugin
  * @author lally elias <lallyelias87@mail.com>
  * @license MIT
  * @since  0.1.0
@@ -98,7 +101,8 @@ const searchablePlugin = (schema, options) => {
    * @name search
    * @description perform free text search using regex
    * @param {String} queryString query string
-   * @param {Function} [cb] optional callback to invoke on success or failure        
+   * @param {Object} filter additional query conditions
+   * @param {Function} [cb] callback to invoke on success or failure        
    * @return {Query|[Object]} query instance if callback not provided else 
    * collection of model instance match specified query string.
    * @public
@@ -117,16 +121,14 @@ const searchablePlugin = (schema, options) => {
     const filters = _.isFunction(filter) ? {} : _.merge({}, filter);
     const done = _.isFunction(filter) ? filter : cb;
 
-    //prepare search query
+    // prepare search query
     let query = this.find();
 
-    //prepare search criteria
+    // prepare search criteria
     let criteria = { $or: [] };
 
-    //iterate over searchable fields and build
-    //search criteria
+    // iterate over searchable fields and build search criteria
     _.forEach(searchables, function (searchable) {
-
       //collect searchable and build regex
       let fieldSearchCriteria = {};
 
@@ -138,14 +140,14 @@ const searchablePlugin = (schema, options) => {
         $options: 'i' //perform case insensitive search
       };
       criteria.$or.push(fieldSearchCriteria);
-
     });
 
-    //ensure query critia on current query instance
+    //ensure query criteria on current query instance
     if (queryString && _.size(searchables) > 0) {
       // $and filters if available
       if (!_.isEmpty(filters)) {
-        criteria = { $and: [filters, criteria] };
+        const _filters = this.where(filters).cast(this);
+        criteria = { $and: [_filters, criteria] };
       }
       query = query.find(criteria);
     }
