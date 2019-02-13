@@ -55,6 +55,56 @@ const collectSearchables = schema => {
 
 
 /**
+ * @function buildSearchCriteria
+ * @name buildSearchCriteria
+ * @description build search criteria from searchable schema paths.
+ * @param {String} queryString search term.
+ * @return {String[]} set of schema searchable paths.
+ * @author lally elias <lallyelias87@mail.com>
+ * @license MIT
+ * @since 0.7.0
+ * @version 0.1.0
+ * @private
+ * const criteria = buildSearchCriteria(queryString, searchables);
+ * //=> { $or: [...] }
+ */
+const buildSearchCriteria = (queryString, searchables) => {
+  // prepare search criteria
+  let criteria = {};
+
+  // check if there is query string and searchable paths
+  const canSearch = (!_.isEmpty(queryString) && !_.isEmpty(searchables));
+
+  // prepara search criteria
+  if (canSearch) {
+    // iterate over searchable paths and build search criteria
+    _.forEach(searchables, searchable => {
+      //initialize path search criteria
+      let pathSearchCriteria = {};
+
+      //prepare regex search on string to simulate SQL like query
+      //with case ignored
+      pathSearchCriteria[searchable] = {
+        //see https://docs.mongodb.com/manual/reference/sql-comparison/
+        $regex: new RegExp(queryString), // lets use LIKE %queryString%
+        $options: 'i' //perform case insensitive search
+      };
+
+      // collect path search criteria
+      if (criteria.$or) {
+        criteria.$or.push(pathSearchCriteria);
+      } else {
+        criteria.$or = [pathSearchCriteria];
+      }
+    });
+  }
+
+  // return builded search criteria
+  return criteria;
+};
+
+
+/**
  * @function searchable
  * @name searchable
  * @description mongoose plugin to regex search on schema searchable fields.
@@ -89,7 +139,7 @@ const collectSearchables = schema => {
  * let query = User.search('john', { $age: { $gte: 14 } });
  */
 const searchablePlugin = (schema, options) => {
-  //merge options
+  // merge options
   options = _.merge({}, options);
 
   // expose searchable fields as schema statics
@@ -121,46 +171,53 @@ const searchablePlugin = (schema, options) => {
     const filters = _.isFunction(filter) ? {} : _.merge({}, filter);
     const done = _.isFunction(filter) ? filter : cb;
 
+    // prepare search criteria
+    const criteria = buildSearchCriteria(queryString, searchables);
+
+    // chain criteria and provided filter
+    let conditions = [];
+
+    // cast filter
+    if (!_.isEmpty(filters)) {
+      try {
+        const _filters = this.where(filters).cast(this);
+        conditions.push(_filters);
+      } catch (error) {
+        return done(error);
+      }
+    }
+
+    // cast search criteria
+    if (!_.isEmpty(criteria)) {
+      try {
+        const _criteria = this.where(criteria).cast(this);
+        conditions.push(_criteria);
+      } catch (error) {
+        return done(error);
+      }
+    }
+
+    // create short-circuited end query
+    conditions =
+      (conditions.length > 1 ? { $and: conditions } : _.first(conditions));
+
     // prepare search query
     let query = this.find();
 
-    // prepare search criteria
-    let criteria = { $or: [] };
-
-    // iterate over searchable fields and build search criteria
-    _.forEach(searchables, function (searchable) {
-      //collect searchable and build regex
-      let fieldSearchCriteria = {};
-
-      //prepare regex search on string to simulate SQL like query
-      //with case ignored
-      fieldSearchCriteria[searchable] = {
-        //see https://docs.mongodb.com/manual/reference/sql-comparison/
-        $regex: new RegExp(queryString), // lets use LIKE %queryString%
-        $options: 'i' //perform case insensitive search
-      };
-      criteria.$or.push(fieldSearchCriteria);
-    });
-
-    //ensure query criteria on current query instance
-    if (queryString && _.size(searchables) > 0) {
-      // $and filters if available
-      if (!_.isEmpty(filters)) {
-        const _filters = this.where(filters).cast(this);
-        criteria = { $and: [_filters, criteria] };
-      }
-      query = query.find(criteria);
+    // ensure query conditions on current query instance
+    if (conditions) {
+      query = query.find(conditions);
     }
 
     //execute query if done callback specified
     if (done && _.isFunction(done)) {
       return query.exec(done);
     }
-    //return query
+
+    // return query for chaining
     else {
       return query;
     }
-
   };
 
 };

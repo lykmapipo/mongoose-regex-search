@@ -6,7 +6,7 @@
 
 mongoose plugin to regex search on schema searchable fields. 
 
-It support regex search in `primitives schema fields`, `array of primitives`, `single embeded doc fields` and `array embeded doc fields`.
+It support regex search in `string schema fields`, `array of strings`, `single embeded doc string fields` and `array embeded doc string fields` with `searchable: true` option.
 
 ## Requirements
 
