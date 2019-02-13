@@ -3,6 +3,7 @@
 
 /* dependencies */
 const _ = require('lodash');
+const { uniq } = require('@lykmapipo/common');
 const {
   eachPath,
   isString,
@@ -14,7 +15,7 @@ const {
  * @function collectSearchables
  * @name collectSearchables
  * @description collect schema searchable fields recursively.
- * @param {Schema} schema valid mongoose schema.
+ * @param {Schema} schema valid mongoose schema instance.
  * @return {String[]} set of all schema searchable paths.
  * @author lally elias <lallyelias87@mail.com>
  * @license MIT
@@ -22,10 +23,11 @@ const {
  * @version 0.1.0
  * @private
  * const searchables = collectSearchables(schema);
+ * //=> [...]
  */
 const collectSearchables = schema => {
   // searchable set
-  const searchables = [];
+  let searchables = [];
 
   // collect searchable path
   const collectSearchablePath = (pathName, schemaType) => {
@@ -47,6 +49,7 @@ const collectSearchables = schema => {
   eachPath(schema, collectSearchablePath);
 
   // return collect searchable schema paths
+  searchables = uniq(searchables);
   return searchables;
 };
 

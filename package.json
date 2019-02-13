@@ -60,6 +60,7 @@
     "mongoose": ">=5.4.11"
   },
   "dependencies": {
+    "@lykmapipo/common": ">=0.8.0",
     "@lykmapipo/env": ">=0.5.0",
     "@lykmapipo/mongoose-common": ">=0.11.0",
     "async": ">=2.6.2",
