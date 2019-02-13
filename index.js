@@ -1,126 +1,118 @@
 'use strict';
 
 
+/* dependencies */
+const _ = require('lodash');
+const {
+  eachPath,
+  isString,
+  isStringArray
+} = require('@lykmapipo/mongoose-common');
+
+
+/**
+ * @function collectSearchables
+ * @name collectSearchables
+ * @description collect schema searchable fields recursively.
+ * @param {Schema} schema valid mongoose schema.
+ * @return {String[]} set of all schema searchable paths.
+ * @author lally elias <lallyelias87@mail.com>
+ * @license MIT
+ * @since 0.7.0
+ * @version 0.1.0
+ * @private
+ * const searchables = collectSearchables(schema);
+ */
+const collectSearchables = schema => {
+  // searchable set
+  const searchables = [];
+
+  // collect searchable path
+  const collectSearchablePath = (pathName, schemaType) => {
+    // check if is string or array of string schema type
+    const isStringSchema =
+      (isString(schemaType) || isStringArray(schemaType));
+
+    // check if path is searchable
+    const isSearchable =
+      (schemaType.options && schemaType.options.searchable);
+
+    // collect if is searchable schema path
+    if (isStringSchema && isSearchable) {
+      searchables.push(pathName);
+    }
+  };
+
+  // collect searchable schema paths
+  eachPath(schema, collectSearchablePath);
+
+  // return collect searchable schema paths
+  return searchables;
+};
+
+
 /**
  * @name searchable
  * @description mongoose plugin to regex search on schema searchable fields.
- * @param  {Schema} schema  valid mongoose schema
+ * @param {Schema} schema  valid mongoose schema
  * @see {@link https://docs.mongodb.com/manual/reference/operator/query/regex/}
  * @see {@link https://docs.mongodb.com/manual/reference/collation/}
  * @return {Function} valid mongoose plugin
  * @author lally elias <lallyelias87@mail.com>
+ * @license MIT
  * @since  0.1.0
  * @version 0.1.0
+ * @public
  * @example
- *
- * const PersonSchema = new Schema({
- *  address: {
- *     type: String,
- *     searchable: true // make field searchable
- *  }
+ * const mongoose = require('mongoose');
+ * const searchable = require('mongoose-regex-search');
+ * const Schema = mongoose.Schema;
+ * 
+ * const UserSchema = new Schema({
+ *  name: { type: String, searchable: true }
  * });
- *
- *...
+ * UserSchema.plugin(searchable);
+ * const User = mongoose.model('User', UserSchema);
  *
  * //search and run query
- * Person.search(<queryString>, <fn>);
- *
+ * User.search('john', (error, results) => { ... });
+ * User.search('john', { $age: { $gte: 14 } }, (error, results) => { ... });
  *
  * //search return query for futher chaining
- * let query = Person.search(<queryString>);
+ * let query = User.search('john');
+ * let query = User.search('john', { $age: { $gte: 14 } });
  */
-
-
-//dependencies
-const _ = require('lodash');
-
-
-module.exports = exports = function (schema, options) {
-
+const searchablePlugin = (schema, options) => {
   //merge options
-  options = _.merge({}, { delta: 0.1 }, options);
+  options = _.merge({}, options);
 
-  //collect searchable fields
-  let searchables = [];
-
-  //collect searchable which are numbers
-  let numbers = [];
+  // expose searchable fields as schema statics
+  const searchables = collectSearchables(schema);
+  schema.statics.SEARCHABLE_FIELDS = searchables;
 
   /**
-   * @name  collectSearchablePath
-   * @description iterate recursively on schema paths and collect searchable
-   *              paths only
-   * @param  {String} pathName   [description]
-   * @param  {SchemaType} schemaType [description]
-   * @param  {String} parentPath [description]
-   * @since  0.3.0
-   * @version 0.1.0
-   * @private
-   */
-  function collectSearchablePaths(pathName, schemaType, parentPath) {
-
-    //TODO handle refs(ObjectId) schema type
-
-    //update path name
-    pathName = _.compact([parentPath, pathName]).join('.');
-
-    //start handle sub schemas
-    const isSchema =
-      schemaType.schema && schemaType.schema.eachPath &&
-      _.isFunction(schemaType.schema.eachPath);
-    if (isSchema) {
-      schemaType.schema.eachPath(function (_pathName, _schemaType) {
-        collectSearchablePaths(_pathName, _schemaType, pathName);
-      });
-    }
-
-    //check if schematype is searchable
-    const isSearchable =
-      _.get(schemaType.options, 'searchable');
-
-    //check if schema instance is number
-    const isNumber =
-      _.get(schemaType, 'instance') === 'Number' ||
-      _.get(schemaType, 'caster.instance') === 'Number';
-
-    //collect searchable fields
-    if (isSearchable) {
-
-      //collect searchable fields
-      searchables.push(pathName);
-
-      //collect number fields
-      if (isNumber) {
-        numbers.push(pathName);
-      }
-
-    }
-
-  }
-
-  //collect searchable path
-  schema.eachPath(function (pathName, schemaType) {
-    collectSearchablePaths(pathName, schemaType);
-  });
-
-  //expose searchable fields as schema statics
-  schema.statics.SEARCHABLE_FIELDS = _.compact(searchables);
-
-  /**
+   * @function search
    * @name search
    * @description perform free text search using regex
-   * @param  {String}   queryString query string
-   * @param  {Function} [done] optional callback to invoke on success or 
-   *                           failure        
-   * @return {Query|[Object]}  query instance if callback not provided else
-   *                           collection of model instance match specified
-   *                           query string
+   * @param {String} queryString query string
+   * @param {Function} [cb] optional callback to invoke on success or failure        
+   * @return {Query|[Object]} query instance if callback not provided else 
+   * collection of model instance match specified query string.
    * @public
+   * @static
+   * @since 0.1.0
+   * @version 0.2.0
+   * @example
+   * User.search('john', (error, results) => { ... });
+   * User.search('john'); //=> Query
+   *
+   * User.search('john', { age: { $gte: 14 } }, (error, results) => { ... });
+   * User.search('john', { age: { $gte: 14 } }); //=> Query
    */
-  schema.statics.search = function (queryString, done) {
-
-    //check if query string is a number
-    const isNumberQueryString = _.isNumber(queryString);
+  schema.statics.search = function search(queryString, filter, cb) {
+    // normalize arguments
+    const filters = _.isFunction(filter) ? {} : _.merge({}, filter);
+    const done = _.isFunction(filter) ? filter : cb;
 
     //prepare search query
     let query = this.find();
@@ -135,33 +127,23 @@ module.exports = exports = function (schema, options) {
       //collect searchable and build regex
       let fieldSearchCriteria = {};
 
-      //check if searchable field is a number
-      const isNumberSearchable = _.indexOf(numbers, searchable) >= 0;
-
       //prepare regex search on string to simulate SQL like query
       //with case ignored
-      if (!isNumberSearchable) {
-        fieldSearchCriteria[searchable] = {
-          //see https://docs.mongodb.com/manual/reference/sql-comparison/
-          $regex: new RegExp(queryString), // lets use LIKE %queryString%
-          $options: 'i' //perform case insensitive search
-        };
-        criteria.$or.push(fieldSearchCriteria);
-      }
-
-      //prepare fake regex search on number fields
-      if (isNumberSearchable && isNumberQueryString) {
-        fieldSearchCriteria[searchable] = {
-          $gt: queryString - options.delta,
-          $lte: queryString + options.delta
-        };
-        criteria.$or.push(fieldSearchCriteria);
-      }
+      fieldSearchCriteria[searchable] = {
+        //see https://docs.mongodb.com/manual/reference/sql-comparison/
+        $regex: new RegExp(queryString), // lets use LIKE %queryString%
+        $options: 'i' //perform case insensitive search
+      };
+      criteria.$or.push(fieldSearchCriteria);
 
     });
 
     //ensure query critia on current query instance
     if (queryString && _.size(searchables) > 0) {
+      // $and filters if available
+      if (!_.isEmpty(filters)) {
+        criteria = { $and: [filters, criteria] };
+      }
       query = query.find(criteria);
     }
 
@@ -177,3 +159,7 @@ module.exports = exports = function (schema, options) {
   };
 
 };
+
+
+/* expose mongoose searchable plugin */
+module.exports = exports = searchablePlugin;

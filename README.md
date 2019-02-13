@@ -8,123 +8,36 @@ mongoose plugin to regex search on schema searchable fields.
 
 It support regex search in `primitives schema fields`, `array of primitives`, `single embeded doc fields` and `array embeded doc fields`.
 
-**Note!: indexing searchable fields is highly advice to improve search performance. This is left to your system specifics for query optimization.**
-
 ## Requirements
 
 - NodeJS v6.5+
 
 ## Install
 ```sh
-$ npm install --save lodash mongoose mongoose-regex-search
+$ npm install --save mongoose-regex-search
 ```
 
 ## Usage
 
-```javascript
+```js
 const mongoose = require('mongoose');
+const searchable = require('mongoose-regex-search');
 const Schema = mongoose.Schema;
 
-//apply mongoose-regex-search plugin to mongoose
-mongoose.plugin(require('mongoose-regex-search'));
-
-...
-
-//sub schema definition
-const Relative = new Schema({
-  name: {
-    type: String,
-    searchable: true
-  }
+const UserSchema = new Schema({
+    name: { type: String, searchable: true }
+    age: { type: Number }
 });
+UserSchema.plugin(searchable);
+const User = mongoose.model('User', UserSchema);
 
-const Country = new Schema({
-  name: {
-    type: String,
-    searchable: true
-  }
-});
+// search and run query
+User.search('john', (error, results) => { ... });
+User.search('john', { $age: { $gte: 14 } }, (error, results) => { ... });
 
-const City = new Schema({
-  name: {
-    type: String,
-    searchable: true
-  },
-  country: Country
-});
-
-//nested
-const Residence = new Schema({
-  street: {
-    type: String,
-    searchable: true
-  },
-  city: City
-});
-
-//prepare schema
-const PersonSchema = new Schema({
-  age: {
-    type: Number,
-    index: true,
-    searchable: true
-  },
-  name: {
-    firstName: {
-      type: String,
-      index: true,
-      searchable: true
-    },
-    surname: {
-      type: String,
-      index: true,
-      searchable: true
-    }
-  },
-  contacts: [{ //TODO
-    form: {
-      type: String,
-      default: 'Phone',
-      index: true,
-      searchable: true
-    },
-    value: {
-      type: String,
-      index: true,
-      searchable: true
-    }
-  }],
-  address: {
-    type: String,
-    index: true,
-    searchable: true
-  },
-  titles: {
-    type: [String],
-    index: true,
-    searchable: true
-  },
-  scores: {
-    type: [Number],
-    index: true,
-    searchable: true
-  },
-  brother: Relative,
-  aunt: { type: Relative },
-  sisters: { type: [Relative] },
-  friends: [Relative],
-  residence: Residence
-});
-
-...
-
-//search and run query
-Person.search(<queryString>, <fn>);
-
-
-//search return query for futher chaining
-let query = Person.search(<queryString>);
-
+// search return query for futher chaining
+let query = User.search('john');
+let query = User.search('john', { $age: { $gte: 14 } });
 ```
 
 ## References

@@ -7,6 +7,7 @@ const _ = require('lodash');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const expect = require('chai').expect;
+const { clear } = require('@lykmapipo/mongoose-test-helpers');
 const searchable = require(path.join(__dirname, '..'));
 
 
@@ -34,19 +35,19 @@ const check = (error, results, usecase, done) => {
 
 /* use cases */
 const usecases = [{
-  context: 'search on field start with cap',
+  scenario: 'search on field start with cap',
   title: 'should work',
   content: 'Earth',
   q: 'ea',
   test: check
 }, {
-  context: 'search on uppercase fields',
+  scenario: 'search on uppercase fields',
   title: 'should work',
   content: 'EARTH',
   q: 'ea',
   test: check
 }, {
-  context: 'search on uppercase fields',
+  scenario: 'search on uppercase fields',
   title: 'should work',
   content: 'EARTH',
   q: 'EA',
@@ -57,13 +58,11 @@ const usecases = [{
 _.forEach(usecases, (usecase) => {
 
   // derive usecase
-  const { context, title, content, q, test } = usecase;
-  describe(`${context}`, () => {
+  const { scenario, title, content, q, test } = usecase;
+  describe(`${scenario}`, () => {
 
     // clear
-    before((done) => {
-      UseCase.deleteMany(done);
-    });
+    before(done => clear(done));
 
     // setup test data
     before((done) => {
@@ -78,9 +77,7 @@ _.forEach(usecases, (usecase) => {
     });
 
     // clear
-    after((done) => {
-      UseCase.deleteMany(done);
-    });
+    after(done => clear(done));
 
   });
 
