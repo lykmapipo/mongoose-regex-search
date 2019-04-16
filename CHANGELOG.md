@@ -1,3 +1,13 @@
+#### 0.7.1 (2019-04-16)
+
+##### Chores
+
+*  force latest dependencies: ([c57c1eb3](https://github.com/lykmapipo/mongoose-regex-search/commit/c57c1eb35a2f20537ea70ce061fcaf03636700cb))
+
+##### Documentation Changes
+
+*  add code of conduct & contributing guide ([51e88d60](https://github.com/lykmapipo/mongoose-regex-search/commit/51e88d60627b64778f53afe540f8365628adf2c5))
+
 #### 0.7.0 (2019-02-13)
 
 ##### New Features
