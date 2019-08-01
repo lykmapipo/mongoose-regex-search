@@ -1,3 +1,13 @@
+#### 0.8.0 (2019-08-01)
+
+##### Chores
+
+*  correct dependencies in groups ([6f54aebc](https://github.com/lykmapipo/mongoose-regex-search/commit/6f54aebcd0d00ab24bf0188aef28778acaf88989))
+
+##### Bug Fixes
+
+*  allow search by number as search term ([a5fcd3bd](https://github.com/lykmapipo/mongoose-regex-search/commit/a5fcd3bd81d9fac2dc988b221500ee00b9797a34))
+
 #### 0.7.8 (2019-08-01)
 
 ##### Chores
