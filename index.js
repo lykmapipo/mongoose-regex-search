@@ -73,7 +73,8 @@ const buildSearchCriteria = (queryString, searchables) => {
   let criteria = {};
 
   // check if there is query string and searchable paths
-  const canSearch = (!_.isEmpty(queryString) && !_.isEmpty(searchables));
+  const searchTerm = String(queryString); 
+  const canSearch = (!_.isEmpty(searchTerm) && !_.isEmpty(searchables));
 
   // prepara search criteria
   if (canSearch) {
