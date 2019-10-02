@@ -53,7 +53,7 @@
     "handlebars": "^4.4.0",
     "jshint-stylish": "^2.2.1",
     "mocha": "^6.2.1",
-    "mongoose": "^5.4.11",
+    "mongoose": ">=5.7.3",
     "shelljs": "^0.8.3",
     "underscore.string": "^3.3.5"
   },
