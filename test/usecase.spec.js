@@ -2,20 +2,17 @@
 
 
 /* dependencies */
-const path = require('path');
 const _ = require('lodash');
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const { createModel } = require('@lykmapipo/mongoose-common');
 const { clear, expect } = require('@lykmapipo/mongoose-test-helpers');
-const searchable = require(path.join(__dirname, '..'));
+const searchable = require('..');
 
 
 /* prepare schema */
-const UseCaseSchema = new Schema({
+const UseCaseSchema = {
   content: { type: String, index: true, searchable: true }
-});
-UseCaseSchema.plugin(searchable);
-const UseCase = mongoose.model('UseCase', UseCaseSchema);
+};
+const UseCase = createModel(UseCaseSchema, { modelName: 'UseCase' }, searchable);
 
 
 /* test */

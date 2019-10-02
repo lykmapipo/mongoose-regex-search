@@ -1,11 +1,10 @@
 'use strict';
 
 //dependencies
-const path = require('path');
 const _ = require('lodash');
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const { Schema, createModel } = require('@lykmapipo/mongoose-common');
 const { expect, faker } = require('@lykmapipo/mongoose-test-helpers');
+const searchable = require('..');
 
 //TODO add searchable doc and index it to support refs
 
@@ -42,7 +41,7 @@ const Residence = new Schema({
 });
 
 //prepare schema
-const PersonSchema = new Schema({
+const PersonSchema = {
   age: {
     type: Number,
     index: true,
@@ -93,9 +92,8 @@ const PersonSchema = new Schema({
   sisters: { type: [Relative] },
   friends: [Relative],
   residence: Residence
-});
-PersonSchema.plugin(require(path.join(__dirname, '..')));
-const Person = mongoose.model('Person', PersonSchema);
+};
+const Person = createModel(PersonSchema, { modelName: 'Person' }, searchable);
 
 describe('internals', () => {
 
@@ -476,7 +474,6 @@ describe('internals', () => {
 
   it('should filter and search with falsey query string', done => {
     const filter = { age: { $eq: person.age } };
-    enableDebug();
     Person.search(undefined, filter, (error, results) => {
       expect(error).to.not.exist;
       expect(results).to.exist;
