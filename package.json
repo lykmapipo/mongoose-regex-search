@@ -19,7 +19,7 @@
   ],
   "main": "index.js",
   "scripts": {
-    "test": "grunt test"
+    "test": "NODE_ENV=test grunt test"
   },
   "repository": {
     "type": "git",

@@ -6,8 +6,7 @@ const path = require('path');
 const _ = require('lodash');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const expect = require('chai').expect;
-const { clear } = require('@lykmapipo/mongoose-test-helpers');
+const { clear, expect } = require('@lykmapipo/mongoose-test-helpers');
 const searchable = require(path.join(__dirname, '..'));
 
 

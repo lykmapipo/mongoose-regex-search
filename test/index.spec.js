@@ -5,8 +5,7 @@ const path = require('path');
 const _ = require('lodash');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const faker = require('faker');
-const expect = require('chai').expect;
+const { expect, faker } = require('@lykmapipo/mongoose-test-helpers');
 
 //TODO add searchable doc and index it to support refs
 
@@ -445,6 +444,32 @@ describe('internals', () => {
     Person.search(q, { age: { $eq: person.age } }, (error, results) => {
       expect(error).to.not.exist;
       expect(results.length).to.be.equal(0);
+      done(error, results);
+    });
+  });
+
+  it('should ignore search with null query string', done => {
+    const q = null;
+    Person.search(q, (error, results) => {
+      expect(error).to.not.exist;
+      expect(results).to.have.length.at.least(1);
+      done(error, results);
+    });
+  });
+
+  it('should ignore search with empty query string', done => {
+    const q = ' ';
+    Person.search(q, (error, results) => {
+      expect(error).to.not.exist;
+      expect(results).to.have.length.at.least(1);
+      done(error, results);
+    });
+  });
+
+  it('should ignore search with undefined query string', done => {
+    Person.search(undefined, (error, results) => {
+      expect(error).to.not.exist;
+      expect(results).to.have.length.at.least(1);
       done(error, results);
     });
   });

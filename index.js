@@ -73,7 +73,7 @@ const buildSearchCriteria = (queryString, searchables) => {
   let criteria = {};
 
   // check if there is query string and searchable paths
-  const searchTerm = String(queryString); 
+  const searchTerm = String(_.trim(queryString));
   const canSearch = (!_.isEmpty(searchTerm) && !_.isEmpty(searchables));
 
   // prepara search criteria
@@ -87,7 +87,7 @@ const buildSearchCriteria = (queryString, searchables) => {
       //with case ignored
       pathSearchCriteria[searchable] = {
         //see https://docs.mongodb.com/manual/reference/sql-comparison/
-        $regex: new RegExp(queryString), // lets use LIKE %queryString%
+        $regex: new RegExp(searchTerm), // lets use LIKE %queryString%
         $options: 'i' //perform case insensitive search
       };
 
