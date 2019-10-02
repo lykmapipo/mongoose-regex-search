@@ -1,6 +1,6 @@
 {
   "name": "mongoose-regex-search",
-  "version": "0.8.4",
+  "version": "0.8.5",
   "description": "mongoose plugin to regex search on schema searchable fields.",
   "keywords": [
     "mongoose",

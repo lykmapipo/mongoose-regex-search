@@ -1,3 +1,20 @@
+#### 0.8.5 (2019-10-02)
+
+##### Chores
+
+* **deps:**
+  *  force latest mongoose peer version ([c2522fd6](https://github.com/lykmapipo/mongoose-regex-search/commit/c2522fd61119c17ca6e4396b5ff092a7f9918147))
+  *  force latest version & audit fix ([b0fb794a](https://github.com/lykmapipo/mongoose-regex-search/commit/b0fb794aefb45bfa9975919f119865faa5e0b885))
+
+##### Bug Fixes
+
+*  ignore search with falsey query string ([0d87fca2](https://github.com/lykmapipo/mongoose-regex-search/commit/0d87fca2228584f3b3890ad1bc4a59b456f8e5ba))
+
+##### Tests
+
+*  use test helpers ([e9d9eb94](https://github.com/lykmapipo/mongoose-regex-search/commit/e9d9eb944db1def5bf549cb8aca849eb574dc563))
+*  add test cases for falsey query string & filter ([0f139abe](https://github.com/lykmapipo/mongoose-regex-search/commit/0f139abeac8d0145f0196c54b19139ce2337d908))
+
 #### 0.8.4 (2019-09-28)
 
 ##### Chores
