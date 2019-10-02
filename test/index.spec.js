@@ -452,7 +452,7 @@ describe('internals', () => {
     const q = null;
     Person.search(q, (error, results) => {
       expect(error).to.not.exist;
-      expect(results).to.have.length.at.least(1);
+      expect(results).to.have.length.above(0);
       done(error, results);
     });
   });
@@ -461,7 +461,7 @@ describe('internals', () => {
     const q = ' ';
     Person.search(q, (error, results) => {
       expect(error).to.not.exist;
-      expect(results).to.have.length.at.least(1);
+      expect(results).to.have.length.above(0);
       done(error, results);
     });
   });
@@ -469,7 +469,27 @@ describe('internals', () => {
   it('should ignore search with undefined query string', done => {
     Person.search(undefined, (error, results) => {
       expect(error).to.not.exist;
-      expect(results).to.have.length.at.least(1);
+      expect(results).to.have.length.above(0);
+      done(error, results);
+    });
+  });
+
+  it('should filter and search with falsey query string', done => {
+    const filter = { age: { $eq: person.age } };
+    enableDebug();
+    Person.search(undefined, filter, (error, results) => {
+      expect(error).to.not.exist;
+      expect(results).to.exist;
+      expect(results).to.have.length.above(0);
+
+      //assert single result
+      const found = results[0];
+      expect(found.address).to.exist;
+
+      expect(found.name.firstName).to.equal(person.name.firstName);
+      expect(found.name.lastName).to.equal(person.name.lastName);
+      expect(found.address).to.equal(person.address);
+
       done(error, results);
     });
   });
