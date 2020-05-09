@@ -1,3 +1,9 @@
+#### 0.8.23 (2020-05-09)
+
+##### Chores
+
+* **deps:**  force latest version & audit fix ([c705e9bc](https://github.com/lykmapipo/mongoose-regex-search/commit/c705e9bcd00615e1db2aa3f7066ef5f1f72c41eb))
+
 #### 0.8.22 (2020-05-02)
 
 ##### Chores
