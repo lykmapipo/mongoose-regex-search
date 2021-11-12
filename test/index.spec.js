@@ -97,7 +97,7 @@ const Person = createModel(PersonSchema, { modelName: 'Person' }, searchable);
 
 describe('internals', () => {
   let person = {
-    age: faker.random.number({ min: 20, max: 45 }),
+    age: faker.datatype.number({ min: 20, max: 45 }),
     name: {
       firstName: faker.name.firstName(),
       surname: faker.name.lastName(),
@@ -105,8 +105,8 @@ describe('internals', () => {
     address: faker.address.streetAddress(),
     titles: [faker.name.jobTitle(), faker.name.jobTitle()],
     scores: [
-      faker.random.number({ min: 20, max: 45 }),
-      faker.random.number({ min: 20, max: 45 }),
+      faker.datatype.number({ min: 20, max: 45 }),
+      faker.datatype.number({ min: 20, max: 45 }),
     ],
     brother: { name: faker.name.findName() },
     aunt: { name: faker.name.findName() },
