@@ -1,19 +1,17 @@
-'use strict';
-
-
-/* dependencies */
-const _ = require('lodash');
-const { createModel } = require('@lykmapipo/mongoose-common');
-const { clear, expect } = require('@lykmapipo/mongoose-test-helpers');
-const searchable = require('..');
-
+import _ from 'lodash';
+import { createModel } from '@lykmapipo/mongoose-common';
+import { clear, expect } from '@lykmapipo/mongoose-test-helpers';
+import searchable from '../src';
 
 /* prepare schema */
 const UseCaseSchema = {
-  content: { type: String, index: true, searchable: true }
+  content: { type: String, index: true, searchable: true },
 };
-const UseCase = createModel(UseCaseSchema, { modelName: 'UseCase' }, searchable);
-
+const UseCase = createModel(
+  UseCaseSchema,
+  { modelName: 'UseCase' },
+  searchable
+);
 
 /* test */
 const check = (error, results, usecase, done) => {
@@ -21,44 +19,44 @@ const check = (error, results, usecase, done) => {
   expect(results).to.exist;
   expect(results).to.have.length.above(0);
 
-  //assert single result
+  // assert single result
   const found = results[0];
   expect(found.content).to.equal(usecase.content);
 
   done(error, results);
 };
 
-
 /* use cases */
-const usecases = [{
-  scenario: 'search on field start with cap',
-  title: 'should work',
-  content: 'Earth',
-  q: 'ea',
-  test: check
-}, {
-  scenario: 'search on uppercase fields',
-  title: 'should work',
-  content: 'EARTH',
-  q: 'ea',
-  test: check
-}, {
-  scenario: 'search on uppercase fields',
-  title: 'should work',
-  content: 'EARTH',
-  q: 'EA',
-  test: check
-}];
-
+const usecases = [
+  {
+    scenario: 'search on field start with cap',
+    title: 'should work',
+    content: 'Earth',
+    q: 'ea',
+    test: check,
+  },
+  {
+    scenario: 'search on uppercase fields',
+    title: 'should work',
+    content: 'EARTH',
+    q: 'ea',
+    test: check,
+  },
+  {
+    scenario: 'search on uppercase fields',
+    title: 'should work',
+    content: 'EARTH',
+    q: 'EA',
+    test: check,
+  },
+];
 
 _.forEach(usecases, (usecase) => {
-
   // derive usecase
   const { scenario, title, content, q, test } = usecase;
   describe(`${scenario}`, () => {
-
     // clear
-    before(done => clear(done));
+    before((done) => clear(done));
 
     // setup test data
     before((done) => {
@@ -73,8 +71,6 @@ _.forEach(usecases, (usecase) => {
     });
 
     // clear
-    after(done => clear(done));
-
+    after((done) => clear(done));
   });
-
 });

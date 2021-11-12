@@ -2,6 +2,33 @@
   "name": "mongoose-regex-search",
   "version": "0.8.30",
   "description": "mongoose plugin to regex search on schema searchable fields.",
+  "main": "lib/index.js",
+  "module": "es/index.js",
+  "scripts": {
+    "clean": "rimraf lib dist es umd logs",
+    "prepare": "husky install",
+    "prebuild": "npm test && npm run clean",
+    "build": "rollup -c",
+    "lint": "eslint --fix --ext .js src/ test/ examples/ rollup.config.js",
+    "prettier": "prettier --write '**/*.{md,json,yml,html}'",
+    "pretest": "npm run lint",
+    "test": "NODE_ENV=test nyc --reporter=html --reporter=text mocha --exit --timeout=8000 --require @babel/register test/**/*.spec.js",
+    "test:unit": "NODE_ENV=test npm run pretest && NODE_ENV=test mocha --exit --timeout=8000 --require @babel/register test/unit/**/*.spec.js",
+    "test:integration": "NODE_ENV=test npm run pretest && NODE_ENV=test mocha --exit --timeout=8000 --require @babel/register test/integration/**/*.spec.js",
+    "coverage": "nyc report --reporter=text-lcov | coveralls",
+    "docs": "doxdox 'lib/**/*.js' -p package.json -l markdown -o DOCUMENTATION.md",
+    "cmt": "git add -A && git-cz",
+    "changelog": "changelog",
+    "chore:deps": "ncu -u --timeout=60000 && npm install --save --timeout=60000",
+    "chore:deps:minor": "ncu -u --target=minor --timeout=60000 && npm install --save --timeout=60000",
+    "chore:deps:patch": "ncu -u --target=patch --timeout=60000 && npm install --save --timeout=60000",
+    "lint:config": "eslint --print-config rollup.config.js",
+    "examples": "NODE_ENV=development BASE_PATH=./examples babel-node ./examples/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lykmapipo/mongoose-regex-search.git"
+  },
   "keywords": [
     "mongoose",
     "mongoose-plugin",
@@ -17,55 +44,90 @@
     "expression",
     "regular"
   ],
-  "main": "index.js",
-  "scripts": {
-    "test": "NODE_ENV=test grunt test"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/lykmapipo/mongoose-regex-search.git"
-  },
   "author": {
     "name": "lykmapipo",
     "email": "lallyelias87@gmail.com",
     "url": "https://github.com/lykmapipo"
   },
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/lykmapipo/mongoose-regex-search/issues"
-  },
-  "homepage": "https://github.com/lykmapipo/mongoose-regex-search",
   "contributors": [
     {
       "name": "lykmapipo",
-      "github": "https://github.com/lykmapipo"
+      "email": "lallyelias87@gmail.com",
+      "url": "https://github.com/lykmapipo"
     }
   ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lykmapipo/mongoose-regex-search/issues",
+    "email": "lallyelias87@gmail.com"
+  },
+  "homepage": "https://github.com/lykmapipo/mongoose-regex-search",
   "devDependencies": {
-    "@lykmapipo/mongoose-faker": "^0.10.26",
-    "@lykmapipo/mongoose-test-helpers": "^0.8.4",
-    "chai": "^4.2.0",
-    "cryptiles": "^4.1.3",
-    "faker": "^4.1.0",
-    "grunt": "^1.2.1",
-    "grunt-contrib-jshint": "^2.1.0",
-    "grunt-contrib-watch": "^1.1.0",
-    "grunt-mocha-test": "^0.13.3",
-    "handlebars": "^4.7.6",
-    "jshint-stylish": "^2.2.1",
-    "mocha": "^8.1.1",
-    "mongoose": ">=5.9.28",
-    "shelljs": "^0.8.4",
-    "underscore.string": "^3.3.5"
+    "@babel/cli": "^7.16.0",
+    "@babel/core": "^7.16.0",
+    "@babel/node": "^7.16.0",
+    "@babel/preset-env": "^7.16.0",
+    "@babel/register": "^7.16.0",
+    "@commitlint/cli": "^14.1.0",
+    "@commitlint/config-conventional": "^14.1.0",
+    "@commitlint/travis-cli": "^14.1.0",
+    "@lykmapipo/mongoose-faker": ">=0.12.0",
+    "@lykmapipo/mongoose-test-helpers": ">=0.10.0",
+    "@lykmapipo/test-helpers": ">=0.6.23",
+    "chai": "^4.3.4",
+    "commitizen": "^4.2.4",
+    "coveralls": "^3.1.1",
+    "cz-conventional-changelog": "^3.3.0",
+    "doxdox": "^3.0.0",
+    "eslint": "^8.2.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-jsdoc": "^37.0.3",
+    "eslint-plugin-mocha": "^9.0.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "generate-changelog": "^1.8.0",
+    "husky": "^7.0.4",
+    "lint-staged": "^11.2.6",
+    "mocha": "^9.1.3",
+    "mongoose": ">=6.0.12",
+    "nyc": "^15.1.0",
+    "prettier": "^2.4.1",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.60.0"
   },
-  "peerDependencies": {
-    "mongoose": ">=5.9.28"
-  },
+  "peerDependencies": {},
   "dependencies": {
-    "@lykmapipo/common": ">=0.38.2",
-    "@lykmapipo/env": ">=0.17.16",
-    "@lykmapipo/mongoose-common": ">=0.38.4",
-    "async": ">=3.2.0",
-    "lodash": ">=4.17.19"
+    "@lykmapipo/common": ">=0.44.5",
+    "@lykmapipo/env": ">=0.17.39",
+    "@lykmapipo/mongoose-common": ">=0.40.0",
+    "async": ">=3.2.2",
+    "lodash": ">=4.17.21"
+  },
+  "engines": {
+    "node": ">=8.11.1",
+    "npm": ">=5.6.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "lint-staged": {
+    "src/**/*.js": [
+      "npm run lint",
+      "git add -A"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
   }
 }

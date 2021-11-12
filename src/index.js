@@ -1,43 +1,33 @@
-'use strict';
-
-
-/* dependencies */
-const _ = require('lodash');
-const { uniq } = require('@lykmapipo/common');
-const {
-  eachPath,
-  isString,
-  isStringArray
-} = require('@lykmapipo/mongoose-common');
-
+import _ from 'lodash';
+import { uniq } from '@lykmapipo/common';
+import { eachPath, isString, isStringArray } from '@lykmapipo/mongoose-common';
 
 /**
  * @function collectSearchables
  * @name collectSearchables
  * @description collect schema searchable fields recursively.
- * @param {Schema} schema valid mongoose schema instance.
- * @return {String[]} set of all schema searchable paths.
+ * @param {object} schema valid mongoose schema instance.
+ * @returns {string[]} set of all schema searchable paths.
  * @author lally elias <lallyelias87@mail.com>
  * @license MIT
  * @since 0.7.0
  * @version 0.1.0
  * @private
+ * @example
  * const searchables = collectSearchables(schema);
  * //=> [...]
  */
-const collectSearchables = schema => {
+const collectSearchables = (schema) => {
   // searchable set
   let searchables = [];
 
   // collect searchable path
   const collectSearchablePath = (pathName, schemaType) => {
     // check if is string or array of string schema type
-    const isStringSchema =
-      (isString(schemaType) || isStringArray(schemaType));
+    const isStringSchema = isString(schemaType) || isStringArray(schemaType);
 
     // check if path is searchable
-    const isSearchable =
-      (schemaType.options && schemaType.options.searchable);
+    const isSearchable = schemaType.options && schemaType.options.searchable;
 
     // collect if is searchable schema path
     if (isStringSchema && isSearchable) {
@@ -53,42 +43,43 @@ const collectSearchables = schema => {
   return searchables;
 };
 
-
 /**
  * @function buildSearchCriteria
  * @name buildSearchCriteria
  * @description build search criteria from searchable schema paths.
- * @param {String} queryString search term.
- * @return {String[]} set of schema searchable paths.
+ * @param {string} queryString search term.
+ * @param {object[]} searchables valid searchable paths
+ * @returns {string[]} set of schema searchable paths.
  * @author lally elias <lallyelias87@mail.com>
  * @license MIT
  * @since 0.7.0
  * @version 0.1.0
  * @private
+ * @example
  * const criteria = buildSearchCriteria(queryString, searchables);
  * //=> { $or: [...] }
  */
 const buildSearchCriteria = (queryString, searchables) => {
   // prepare search criteria
-  let criteria = {};
+  const criteria = {};
 
   // check if there is query string and searchable paths
   const searchTerm = String(_.trim(queryString));
-  const canSearch = (!_.isEmpty(searchTerm) && !_.isEmpty(searchables));
+  const canSearch = !_.isEmpty(searchTerm) && !_.isEmpty(searchables);
 
   // prepara search criteria
   if (canSearch) {
     // iterate over searchable paths and build search criteria
-    _.forEach(searchables, searchable => {
-      //initialize path search criteria
-      let pathSearchCriteria = {};
+    _.forEach(searchables, (searchable) => {
+      // initialize path search criteria
+      const pathSearchCriteria = {};
 
-      //prepare regex search on string to simulate SQL like query
-      //with case ignored
+      // prepare regex search on string to simulate SQL like query
+      // with case ignored
       pathSearchCriteria[searchable] = {
-        //see https://docs.mongodb.com/manual/reference/sql-comparison/
+        // see https://docs.mongodb.com/manual/reference/sql-comparison/
         $regex: new RegExp(searchTerm), // lets use LIKE %queryString%
-        $options: 'i' //perform case insensitive search
+        $options: 'i', // perform case insensitive search
       };
 
       // collect path search criteria
@@ -104,29 +95,27 @@ const buildSearchCriteria = (queryString, searchables) => {
   return criteria;
 };
 
-
 /**
  * @function searchable
  * @name searchable
  * @description mongoose plugin to regex search on schema searchable fields.
- * @param {Schema} schema valid mongoose schema
+ * @param {object} schema valid mongoose schema
  * @see {@link https://docs.mongodb.com/manual/reference/operator/query/regex/}
  * @see {@link https://docs.mongodb.com/manual/reference/collation/}
  * @see {@link https://docs.mongodb.com/manual/reference/operator/query/and/}
  * @see {@link https://docs.mongodb.com/manual/reference/operator/query/or/}
- * @return {Function} valid mongoose schema plugin
  * @author lally elias <lallyelias87@mail.com>
  * @license MIT
  * @since  0.1.0
  * @version 0.1.0
  * @public
  * @example
- * const mongoose = require('mongoose');
- * const searchable = require('mongoose-regex-search');
- * const Schema = mongoose.Schema;
- * 
- * const UserSchema = new Schema({
- *  name: { type: String, searchable: true }
+ * import mongoose from 'mongoose';
+ * import searchable from 'mongoose-regex-search';
+ *
+ * const UserSchema = new mongoose.Schema({
+ *  name: { type: String, searchable: true },
+ *  age: { type: Number }
  * });
  * UserSchema.plugin(searchable);
  * const User = mongoose.model('User', UserSchema);
@@ -139,22 +128,20 @@ const buildSearchCriteria = (queryString, searchables) => {
  * let query = User.search('john');
  * let query = User.search('john', { $age: { $gte: 14 } });
  */
-const searchablePlugin = (schema, options) => {
-  // merge options
-  options = _.merge({}, options);
-
+const searchablePlugin = (schema) => {
   // expose searchable fields as schema statics
   const searchables = collectSearchables(schema);
+  // eslint-disable-next-line no-param-reassign
   schema.statics.SEARCHABLE_FIELDS = searchables;
 
   /**
    * @function search
    * @name search
    * @description perform free text search using regex
-   * @param {String} queryString query string
-   * @param {Object} filter additional query conditions
-   * @param {Function} [cb] callback to invoke on success or failure        
-   * @return {Query|[Object]} query instance if callback not provided else 
+   * @param {string} queryString query string
+   * @param {object} filter additional query conditions
+   * @param {Function} [cb] callback to invoke on success or failure
+   * @returns {object | object[]} query instance if callback not provided else
    * collection of model instance match specified query string.
    * @public
    * @static
@@ -167,6 +154,7 @@ const searchablePlugin = (schema, options) => {
    * User.search('john', { age: { $gte: 14 } }, (error, results) => { ... });
    * User.search('john', { age: { $gte: 14 } }); //=> Query
    */
+  // eslint-disable-next-line no-param-reassign
   schema.statics.search = function search(queryString, filter, cb) {
     // normalize arguments
     const filters = _.isFunction(filter) ? {} : _.merge({}, filter);
@@ -181,8 +169,8 @@ const searchablePlugin = (schema, options) => {
     // cast filter
     if (!_.isEmpty(filters)) {
       try {
-        const _filters = this.where(filters).cast(this);
-        conditions.push(_filters);
+        const $filters = this.where(filters).cast(this);
+        conditions.push($filters);
       } catch (error) {
         return done(error);
       }
@@ -191,8 +179,8 @@ const searchablePlugin = (schema, options) => {
     // cast search criteria
     if (!_.isEmpty(criteria)) {
       try {
-        const _criteria = this.where(criteria).cast(this);
-        conditions.push(_criteria);
+        const $criteria = this.where(criteria).cast(this);
+        conditions.push($criteria);
       } catch (error) {
         return done(error);
       }
@@ -200,7 +188,7 @@ const searchablePlugin = (schema, options) => {
 
     // create short-circuited end query
     conditions =
-      (conditions.length > 1 ? { $and: conditions } : _.first(conditions));
+      conditions.length > 1 ? { $and: conditions } : _.first(conditions);
 
     // prepare search query
     let query = this.find();
@@ -210,19 +198,16 @@ const searchablePlugin = (schema, options) => {
       query = query.find(conditions);
     }
 
-    //execute query if done callback specified
+    // execute query if done callback specified
     if (done && _.isFunction(done)) {
       return query.exec(done);
     }
 
     // return query for chaining
-    else {
-      return query;
-    }
-  };
 
+    return query;
+  };
 };
 
-
 /* expose mongoose searchable plugin */
-module.exports = exports = searchablePlugin;
+export default searchablePlugin;

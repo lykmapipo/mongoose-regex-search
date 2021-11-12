@@ -1,10 +1,5 @@
-'use strict';
+import { connect, drop } from '@lykmapipo/mongoose-test-helpers';
 
+before((done) => connect(done));
 
-process.env.NODE_ENV = 'test';
-
-const { connect, drop } = require('@lykmapipo/mongoose-test-helpers');
-
-before(done => connect(done));
-
-after(done => drop(done));
+after((done) => drop(done));
