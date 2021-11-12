@@ -1,3 +1,13 @@
+#### 0.9.0 (2021-11-12)
+
+##### Chores
+
+* **release:**  compile latest source ([183c6553](https://github.com/lykmapipo/mongoose-regex-search/commit/183c6553ead63ea0e440828895863b0f16e5b197))
+
+##### Refactors
+
+*  migrate to es6 ([b01c94dc](https://github.com/lykmapipo/mongoose-regex-search/commit/b01c94dc9ab861a873e87080d7669054942352c7))
+
 #### 0.8.30 (2020-08-08)
 
 ##### Chores
