@@ -90,7 +90,7 @@
     "husky": "^7.0.4",
     "lint-staged": "^11.2.6",
     "mocha": "^9.2.2",
-    "mongoose": ">=6.4.5",
+    "mongoose": ">=6.4.6",
     "nyc": "^15.1.0",
     "prettier": "^2.7.1",
     "rimraf": "^3.0.2",
