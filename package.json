@@ -90,11 +90,11 @@
     "husky": "^7.0.4",
     "lint-staged": "^11.2.6",
     "mocha": "^9.2.2",
-    "mongoose": ">=6.4.6",
+    "mongoose": ">=6.5.0",
     "nyc": "^15.1.0",
     "prettier": "^2.7.1",
     "rimraf": "^3.0.2",
-    "rollup": "^2.77.0"
+    "rollup": "^2.77.2"
   },
   "peerDependencies": {},
   "dependencies": {
